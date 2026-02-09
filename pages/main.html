@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Clean White UI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../static/css/main.css">
+<!-- <link rel="svg" href="main.svg"> -->
+</head>
+
+<body>
+    <header>
+        <div class="header-item"><span>TERA</span></div>
+        <div>
+            <div class="header-item">dasads</div>
+            <div class="header-item">adsads</div>
+        </div>
+    </header>
+    <div class="body">
+        <div class="container" id="container">
+            <div class="indicator" id="indicator"></div>
+
+            <div class="card" id="start"><span>GET START</span></div>
+            <div class="card" id="info"><span>INFO</span></div>
+            <div class="card" id="signin"><span>SIGN IN</span></div>
+            <div class="card" id="block4"><span>Block 4</span></div>
+        </div>
+    </div>
+
+
+
+<svg width="0" height="0">
+    <filter id="liquid">
+        <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.015"
+        numOctaves="1"
+        seed="1"
+        >
+        <animate
+            attributeName="baseFrequency"
+            dur="5s"
+            values="0.012;0.018;0.012"
+            repeatCount="indefinite"
+        />
+        </feTurbulence>
+
+        <feDisplacementMap
+        in="SourceGraphic"
+        scale="15"
+        />
+    </filter>
+</svg>
+<script src="../static/javascript/main.js"></script>
+</body>
+</html>

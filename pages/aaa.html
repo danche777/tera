@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Анимация CSS</title>
+
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.0/gsap.min.js"></script>
+<div class="box" style="width:100px;height:100px;background:red;"></div>
+<script>
+  gsap.to(".box", {x:300, y:200, duration:2, repeat:-1, yoyo:true});
+</script>
+
+</body>
+</html>
