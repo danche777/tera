@@ -5,14 +5,31 @@
     padding: 0;
 }
 
+a {
+    text-decoration: none;
+}
+
+a:active, a:visited, a:link {
+    color: inherit;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 body {
     background: radial-gradient(
     circle at center, 
     #ffffff 0%, 
     #7c7c7c 100%
     );
+
+
     margin: 0;
     height: 100vh;
+    animation: fadeIn 1s ease-in-out forwards;
+    
 }
 
 @font-face {
@@ -25,23 +42,32 @@ body {
 header {
     display: flex;
     justify-content: space-between;
+    height: 6%;
 }
 
 header span {
     font-family: "Space Grotesk", sans-serif;
     font-size: 35px;
     font-weight: 900;
-    text-shadow: #3f3f3f 0px 0px 20px;
+    text-shadow: #000000ad 0px 0px 20px;
+    transition: all 0.3s ease;
+}
+
+header span:hover {
+    font-size: 33px;
+    text-shadow: #000000 0px 0px 3px;
 }
 
 header div {
+    font-family: "Space Grotesk";
+    font-size: 30px;
     display: inline-block;
     padding: 10px 40px;
 }
 
 /* --------------------main panel-------------------- */
 
-.body {
+.body_main {
     margin-top: 10%;
     display: flex;
     justify-content: center;
@@ -53,6 +79,7 @@ header div {
     width: 50%;
     position: relative;
     display: flex;
+    justify-content: center;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 20px;
@@ -79,6 +106,12 @@ header div {
     will-change: transform;
     z-index: 2;
     transform-origin: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.indicator.hidden {
+    opacity: 0;
 }
 
 .indicator::before {
@@ -143,4 +176,187 @@ header div {
 .card:hover span {
     color: #fff;
 }
-/* ---------------------------------------------------- */
+
+/* ----------------- Sign In / Sign up---------------- */
+
+.input_body {
+    position: absolute;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 94%;
+    width: 100%;
+    /* background-color: #333; */
+}
+
+.input_container {
+    /* background-color: aqua; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 30%;
+    height: 50%;
+}
+.sign_up_link {
+    color: #333;
+    font-size: 16px;
+    transition: all 0.25s;
+    cursor: pointer;
+    border-radius: 20px;
+    margin-top: 9px;
+    padding: 4px 4px 8px 4px;
+    text-align: center;
+}
+.sign_up_link:hover {
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.466);
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.466);
+}
+
+#username, 
+#password {
+    width: 50%;
+    height: 40px;
+    min-height: 32px;
+    border-radius: 20px;
+    border: none;
+    padding: 10px;
+    font-size: 18px;
+    background: radial-gradient(
+        circle 30px at left, 
+        #ebebeb 0%, 
+        #535353 4000%
+    );
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition-duration: 0.3s;
+}
+
+#username:focus, 
+#password:focus {
+    width: 60%;
+    height: 60px;
+    outline: none;
+    /* background: radial-gradient(
+        circle 30px at left, 
+        #ebebeb 0%, 
+        #535353 4000%
+    ); */
+    box-shadow: 0 5px 10px rgba(83, 83, 83, 0.5), inset 0 0 10px rgba(83, 83, 83, 0.342);
+}
+
+#password:focus {
+    border-radius: 20px 5px 5px 20px;
+}
+
+button.confirm_btn {
+    position: relative;
+    width: 50%;
+    height: 45px;
+    border: none;
+    border-radius: 5px 5px 20px 20px;
+    font-size: 18px;
+    font-weight: bold;      
+    color: #000000;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    overflow: visible;
+}
+
+/* Контейнер для "выдавливания" */
+button.confirm_btn .tooltip {
+    position: absolute;
+    top: 100%; /* прямо под кнопкой */
+    left: 50%;
+    transform: translateX(-50%) scaleY(0);
+    width: 80%;
+    transform-origin: top center;
+    background: rgba(255, 255, 255, 0.452);
+    color: rgba(0, 0, 0, 0.658);
+    text-shadow: #505050 0px 0px 30px;
+    padding: 6px 12px;
+    border-radius: 0 0 12px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+    pointer-events: none;
+
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.3s ease;
+}
+
+/* Показываем tooltip — плавное "выползание" */
+button.confirm_btn.show-tooltip .tooltip {
+    transform: translateX(-50%) scaleY(1); /* полностью раскрыто */
+    opacity: 1;
+}
+
+button:active {
+    transform: scale(0.94);
+}
+
+/* ==================== PASSWORD EYE BOX ==================== */
+
+.password-container {
+    display: flex;
+    align-items: center;
+    width: 50%;
+    gap: 0;
+    transition: all 0.3s ease;
+}
+
+.password-container:focus-within {
+    width: 60%;
+    gap: 10px;
+}
+
+#password {
+    width: 100% !important;
+    padding: 10px !important;
+}
+
+.eye-box {
+    width: 0;
+    height: 40px;
+    min-width: 0;
+    border-radius: 5px 20px 20px 5px;
+    background: radial-gradient(
+        circle 30px at left, 
+        #ebebeb 0%, 
+        #535353 600%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 10px rgba(83, 83, 83, 0.5), inset 0 0 10px rgba(83, 83, 83, 0.342);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.password-container:focus-within .eye-box {
+    opacity: 1;
+    pointer-events: all;
+    width: 50px;
+    height: 50px;
+}
+
+.eye-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eye-btn:hover {
+    transform: scale(1.15);
+}
