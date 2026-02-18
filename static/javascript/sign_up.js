@@ -54,7 +54,7 @@ async function signUp() {
         window.location.href = "/";
     } else {
         const data = await response.json();
-        alert(data.message);
+        DisplayErrorTooltip(data.message)
     }
 };
 
@@ -76,7 +76,6 @@ button.addEventListener('click', () => {
         DisplayErrorTooltip('password < 8');
     } else if (password.value.length >= 16) {
         DisplayErrorTooltip('password >= 16');
-
         // отправка если проверки были пройдены
     } else {
         signUp()

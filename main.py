@@ -1,3 +1,7 @@
+import time
+from datetime import timedelta
+
+import jwt
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -5,13 +9,34 @@ from fastapi.exceptions import HTTPException
 import sqlite3
 
 
-from schemes import Form
+from schemes import Form, Token
+
+TOKEN_MINUTES, SECRET_KEY, ALGORITHM  = 30, "secret-key", "HS256"
+
+def create_access_token(subject: str, expires_delta=None) -> str:
+    expire = time.time() + (expires_delta or  timedelta(minutes=TOKEN_MINUTES)).total_seconds()
+    to_encode = {"sub": subject, "exp": expire}
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # подключение к FastAPI
 app = FastAPI()
 
 # путь к статическим файлам таким как CSS
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(req, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "message":  exc.detail,
+            "status_code": exc.status_code
+        }
+    )
 
 # подключение к базе данных
 def conectDB():
@@ -46,14 +71,34 @@ def to_create():
 def to_support():
     return FileResponse("pages/info.html")
 
+@app.get("/forum", tags=["lincs"])
+def to_support():
+    return FileResponse("pages/forum.html")
 
 # авторизация формы
 @app.post("/auth")
 async def auth(data: Form):
-    return JSONResponse({
-        "username": data.username,
-        "password": data.password
-    })
+    con, cursor = conectDB()
+
+    user = cursor.execute(
+        """
+        SELECT username, password FROM users WHERE username = ?
+        """,
+        (data.username,)
+    ).fetchall()
+
+    print(cursor.execute("select username, password from users").fetchall())
+
+    if not user:
+        raise HTTPException(status_code=400, detail="username not found")
+
+    password = user[0][1]
+    if data.password != password:
+        raise HTTPException(status_code=400, detail="Incorrect password")
+    else:
+        token = create_access_token(data.username)
+        token = Token(access_token=token)
+        return token
 
 # регестрация формы
 @app.post("/registr")
@@ -71,12 +116,12 @@ async def reg(data: Form):
     
     print(username, data.username)
     if username:
-        raise HTTPException(status_code=400, detail="username alredy exists")
+        raise HTTPException(status_code=400, detail="username already exists")
     cursor.execute(
         '''
         INSERT INTO users (username, password) VALUES (?, ?)
         ''',
-        (data.password, data.username)
+        (data.username, data.password)
     )
     con.commit()
     con.close()

@@ -2,9 +2,11 @@
 const button = document.querySelector('.confirm_btn');
 const username = document.getElementById('username');
 const password = document.getElementById('password');
+
 //  переменные для глаза
 const eyeBtn = document.getElementById('eye-btn');
 const passwordInput = document.getElementById('password');
+
 // переменная для подсказки ToolTip
 let tooltip = document.createElement('div');
 
@@ -48,14 +50,15 @@ async function auth() {
     });
 
     if (response.ok) {
-    // const data = await response.json();
-    // localStorage.setItem("token", data.access_token);
+    const data = await response.json();
+    localStorage.setItem("token", data.access_token);
     window.location.href = "/";
     } else {
     const data = await response.json();
-    alert(data.message);
+    DisplayErrorTooltip(data.message)
     }
 }
+
 // обработчик всех ошибок для кнопки
 button.addEventListener('click', () => {
     // создаём tooltip если его нет
@@ -74,8 +77,7 @@ button.addEventListener('click', () => {
         DisplayErrorTooltip('password < 8');
     } else if (password.value.length >= 16) {
         DisplayErrorTooltip('password >= 16');
-    } else  {
+    } else {
         auth()
     }
-    
 });
