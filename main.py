@@ -1,18 +1,24 @@
+# time и jwt для создания токена
 import time
 from datetime import timedelta
-
 import jwt
+
+# FastAPI
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.exceptions import HTTPException
+
+# база данных
 import sqlite3
 
-
+# pydentic схемы
 from schemes import Form, Token
 
+# константы для создания токена на 30 минут
 TOKEN_MINUTES, SECRET_KEY, ALGORITHM  = 30, "secret-key", "HS256"
 
+# создание токена
 def create_access_token(subject: str, expires_delta=None) -> str:
     expire = time.time() + (expires_delta or  timedelta(minutes=TOKEN_MINUTES)).total_seconds()
     to_encode = {"sub": subject, "exp": expire}
@@ -24,10 +30,7 @@ app = FastAPI()
 # путь к статическим файлам таким как CSS
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
-
-
-
+# отправка любой найденной ошибки FastAPI
 @app.exception_handler(HTTPException)
 async def http_exception_handler(req, exc: HTTPException):
     return JSONResponse(

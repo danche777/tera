@@ -49,24 +49,27 @@ async function auth() {
         })
     });
 
+    // проверка ответа с стороны FastAPI
     if (response.ok) {
     const data = await response.json();
-    localStorage.setItem("token", data.access_token);
-    window.location.href = "/";
+    localStorage.setItem("token", data.access_token); // получение токена
+    window.location.href = "/"; // перенос  на главную страницу
     } else {
     const data = await response.json();
-    DisplayErrorTooltip(data.message)
+    DisplayErrorTooltip(data.message) // ошибка с стороны FastAPI
     }
 }
 
 // обработчик всех ошибок для кнопки
 button.addEventListener('click', () => {
+
     // создаём tooltip если его нет
     if (!button.querySelector('.tooltip')) {
         tooltip.classList.add('tooltip');
         button.appendChild(tooltip);
     };
-        // проверка пусты ли поля
+
+    // ошибки
     if (!username.value || !password.value) {
         DisplayErrorTooltip('Enter text');
     } else if (username.value.length <= 1) {
