@@ -411,6 +411,6 @@ button:active {
 
 .upvoute_button, .downvote_button, .item_forum {
     border: #000 solid 1px;
-    backdrop-filter: blur(20%)
-    border-radius: 20px;
-}
+    backdrop-filter: blur(100%);
+    background-color: #0000008a;
+} adad
