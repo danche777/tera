@@ -1,7 +1,8 @@
 # time и jwt для создания токена
 import time
 from datetime import timedelta
-import jwt
+from jwt import encode, decode
+
 
 # FastAPI
 from fastapi import FastAPI
@@ -9,11 +10,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.exceptions import HTTPException
 
+
 # база данных
 import sqlite3
 
+
 # pydentic схемы
 from schemes import Form, Token
+
+
 
 # константы для создания токена на 30 минут
 TOKEN_MINUTES, SECRET_KEY, ALGORITHM  = 30, "secret-key", "HS256"
@@ -22,7 +27,9 @@ TOKEN_MINUTES, SECRET_KEY, ALGORITHM  = 30, "secret-key", "HS256"
 def create_access_token(subject: str, expires_delta=None) -> str:
     expire = time.time() + (expires_delta or  timedelta(minutes=TOKEN_MINUTES)).total_seconds()
     to_encode = {"sub": subject, "exp": expire}
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
 
 # подключение к FastAPI
 app = FastAPI()
@@ -57,6 +64,7 @@ def conectDB():
     return con, cursor
 
 
+
 # ссылки на все страницы
 @app.get("/", tags=["lincs"])
 def root():
@@ -77,6 +85,7 @@ def to_support():
 @app.get("/forum", tags=["lincs"])
 def to_support():
     return FileResponse("pages/forum.html")
+
 
 # авторизация формы
 @app.post("/auth")
@@ -103,6 +112,7 @@ async def auth(data: Form):
         token = Token(access_token=token)
         return token
 
+
 # регестрация формы
 @app.post("/registr")
 async def reg(data: Form):
@@ -128,7 +138,20 @@ async def reg(data: Form):
     )
     con.commit()
     con.close()
-    
+
+
+@app.post("/check_token")
+def check_token(data: Token):
+    payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    expires_at = payload["exp"]
+    username = payload["sub"]
+    print(expires_at, username)
+    print(time.time() >= expires_at)
+    if time.time() >= expires_at:
+        raise HTTPException(detail="Token expired", status_code=404)
+    print(data.access_token)
+    return {"status": "ok"}, username
+
 
 
 

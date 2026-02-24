@@ -62,7 +62,6 @@ animate();
 
 // перемеенные для изменения страницы
 const getStartButton = document.getElementById("start")
-const token = localStorage.getItem("token")
 
 // изменение пути
 function swapPageTo(link) {
@@ -71,10 +70,25 @@ function swapPageTo(link) {
         window.location.href = link;
     });
 }
-// провека  токена
-console.log(token);
-if (!token) {
-    swapPageTo("/sign_in")
-} else if (token) {
-    swapPageTo('/forum')
-}
+
+getStartButton.addEventListener("click", async function () {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        swapPageTo('/sign_in');
+    } else {
+        swapPageTo('/forum');
+        const response = await fetch("/check_token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                access_token: token
+            })
+        });
+        
+        if (!response.ok) {
+            localStorage.removeItem("token");
+            swapPageTo('/sign_in');
+        }
+    }
+    
+});

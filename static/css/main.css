@@ -377,17 +377,15 @@ button:active {
 }
 
 .item_forum {
-    /* background-color: yellow; */
-    border: #000 solid 2px;
-    min-height: 300px;
+    border: #1a1a1a52 solid 1px;
+    border-radius: 20px;
 }
 
 .content_item_forum {
     /* background-color: lightblue; */
-    height: 230px;
-    padding: 20px;
+    padding: 10px;
     text-wrap: wrap;
-    font-size: 30px;
+    font-size: 25px;
     font-family: 'SpaceGrotesk';
 }
 
@@ -395,6 +393,7 @@ button:active {
     /* background-color: green; */
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     gap: 10px;
     width: 100%;
     height: 70px;
@@ -403,14 +402,56 @@ button:active {
 
 .upvoute_button, .downvote_button {
     /* background-color: blue; */
+    border: #1a1a1a52 solid 1px;
+    border-radius: 20px;
     position: relative;
-    border-radius: 13px;
     width: 50px;
     height: 50px;
+    transition-duration: 0.4s;
+    padding: 12px;
 }
 
-.upvoute_button, .downvote_button, .item_forum {
-    border: #000 solid 1px;
-    backdrop-filter: blur(100%);
-    background-color: #0000008a;
-} adad
+.username, .comments {
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 20px;
+    font-family: 'SpaceGrotesk';
+    /* text-align: center; */
+    justify-items: center;
+    align-items: center;
+}
+
+.upvoute_button:hover, 
+.downvote_button:hover {
+    background-color: #00000063;
+}
+
+.strt_post_button {
+    /* border: #1a1a1a52 solid 1px; */
+    transition-duration: 0.4s;
+
+}
+
+.strt_post_button:hover {
+    filter: blur(20%);
+    box-shadow: #0000007e 5px 5px 20px 0px;
+                /* inset #0000005b 0 0 20px 0px; */
+    border-radius: 20px;
+    animation: shake 2s infinite both;
+    cursor: pointer;
+}
+
+@keyframes shake {
+    0%, 100% {
+        rotate: 0deg;
+        background-color: #00000000;
+    }
+    10%, 30%, 50%, 70%, 90% {
+        rotate: 5deg;
+        background-color: #ffffff;
+    }
+    20%, 40%, 60%, 80% {
+        rotate: -5deg;
+        background-color: #ff0000;
+    }
+}
