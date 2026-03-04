@@ -53,90 +53,6 @@ function showCreatePostModal() {
     // 4. Добавляем в body
     document.body.appendChild(modalOverlay);
 
-    // 5. Добавляем стили (через JS для удобства, лучше вынести в CSS)
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            animation: fadeIn 0.3s forwards;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-            transform: translateY(-20px);
-            animation: slideIn 0.3s forwards;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .close-modal {
-            font-size: 24px;
-            cursor: pointer;
-            color: #aaa;
-        }
-
-        .close-modal:hover {
-            color: #000;
-        }
-
-        .modal-body textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            margin-bottom: 15px;
-            font-family: inherit;
-            box-sizing: border-box; /* Важно для корректной ширины */
-        }
-
-        .submit-post-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            float: right;
-        }
-
-        .submit-post-btn:hover {
-            background-color: #0056b3;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            to { transform: translateY(0); }
-        }
-    `;
-    document.head.appendChild(style);
-
     // 6. Логика закрытия
     const closeModal = () => {
         modalOverlay.style.opacity = '0';
@@ -166,22 +82,22 @@ function showCreatePostModal() {
         }
 
         // Раскомментируйте и адаптируйте для реального запроса
-        /*
+
         const token = localStorage.getItem("token");
-        const response = await fetch("/create_post", {
+        const response = await fetch("/add_post", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 access_token: token,
-                content: text 
+                content: text
             })
         });
-        
+
         if (response.ok) {
             closeModal();
             // Логика обновления списка постов
         }
-        */
+
        
        console.log("Пост отправлен:", text);
        closeModal();

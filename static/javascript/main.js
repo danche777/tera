@@ -71,7 +71,7 @@ function swapPageTo(link) {
     });
 }
 
-getStartButton.addEventListener("click", async function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("token");
     if (!token) {
         swapPageTo('/sign_in');

@@ -6,3 +6,7 @@ class Form(BaseModel):
 
 class Token(BaseModel):
     access_token: str
+
+class Post(BaseModel):
+    access_token: str
+    content: str

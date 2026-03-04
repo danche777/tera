@@ -49,6 +49,7 @@ async def http_exception_handler(req, exc: HTTPException):
     )
 
 # подключение к базе данных
+# подключение к базе данных
 def conectDB():
     con = sqlite3.connect("data.db")
     cursor = con.cursor()
@@ -61,7 +62,18 @@ def conectDB():
         );
         '''
     )
+
+    cursor.execute(
+        '''
+        CREATE TABLE IF NOT EXISTS posts(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            content TEXT,
+            username VARCHAR(16)
+        );
+        '''
+    )
     return con, cursor
+
 
 
 
@@ -82,9 +94,11 @@ def to_create():
 def to_support():
     return FileResponse("pages/info.html")
 
-@app.get("/forum", tags=["lincs"])
-def to_support():
-    return FileResponse("pages/forum.html")
+@app.get("/forum", tags=["lincs"], response_class=HTMLResponse)
+def to_support(request: Request):
+    context = get_posts(request)
+    return templates.TemplatesResponse("pages/forum.html", context)
+
 
 
 # авторизация формы
@@ -151,6 +165,44 @@ def check_token(data: Token):
         raise HTTPException(detail="Token expired", status_code=404)
     print(data.access_token)
     return {"status": "ok"}, username
+
+
+app.post("/add_post")
+def add_post(data: Post):
+    con, cursor = conectDB()
+
+    payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    username = payload["sub"]
+    cursor.execute(
+        '''
+        INSERT INTO posts (content, username) VALUES (?, ?)
+        ''',
+        (data.content, username)
+    )
+
+    con.commit()
+    con.close()
+
+def get_posts(request):
+    con, cursor = conectDB()
+    posts = cursor.execute(
+        "SELECT * FROM posts"
+    ).fetchall()
+
+    context = {
+        "request": request,
+        "posts": []
+    }
+
+    for i in range(len(posts)):
+        context["posts"].append(
+            {
+                "content": [1],
+                "username": [2]
+            }
+        )
+
+    return context
 
 
 
