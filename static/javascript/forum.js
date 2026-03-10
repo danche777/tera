@@ -76,31 +76,37 @@ function showCreatePostModal() {
     // 7. Логика отправки (пример)
     submitBtn.onclick = async () => {
         const text = textarea.value;
+        
         if (!text.trim()) {
-            alert("Пост не может быть пустым!"); // Или используйте вашу систему уведомлений
+            alert("Пост не может быть пустым!");
             return;
         }
 
-        // Раскомментируйте и адаптируйте для реального запроса
+        try {
+            const token = localStorage.getItem("token");
 
-        const token = localStorage.getItem("token");
-        const response = await fetch("/add_post", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                access_token: token,
-                content: text
-            })
-        });
+            const response = await fetch("/add_post", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    access_token: token,
+                    content: text
+                })
+            });
 
-        if (response.ok) {
-            closeModal();
-            // Логика обновления списка постов
+            if (response.ok) {
+                // Перезагрузка только при успешном ответе
+                location.reload();
+            } else {
+                const error = await response.text();
+                console.error("Ошибка сервера:", error);
+                alert("Не удалось опубликовать пост");
+            }
+
+        } catch (err) {
+            console.error("Ошибка запроса:", err);
+            alert("Ошибка соединения с сервером");
         }
-
-       
-       console.log("Пост отправлен:", text);
-       closeModal();
     };
 }
 
@@ -108,4 +114,13 @@ function showCreatePostModal() {
 postButton.addEventListener("click", (e) => {
     e.preventDefault();
     showCreatePostModal();
+    
 });
+
+
+
+const commentButton = document.querySelector(".comments_button");
+
+commentButton.onclick = function () {
+    window.location.href = "/comments";
+}

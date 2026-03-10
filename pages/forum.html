@@ -17,7 +17,7 @@
     <div class="body_forum">
         <div class="container_forum">
             {% for item in posts %}
-            <div class="item_forum">
+            <div class="item_forum" id="{{ item['id'] }}">
                 <div class="content_item_forum">{{ item["content"] }}</div>
                 <div class="objects_item_forun">
                     <div style=" display: flex; flex-direction: row; gap: 20px;">
@@ -35,7 +35,7 @@
                     </div>
                     <div style=" display: flex; flex-direction: row; gap: 40px">
                         <div class="username">{{ item["username"] }}</div>
-                        <div class="comments">comments</div>
+                        <button class="comments_button">comments</button>
                     </div>
                 </div>
             </div>

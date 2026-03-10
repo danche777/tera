@@ -5,10 +5,11 @@ from jwt import encode, decode
 
 
 # FastAPI
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from fastapi.exceptions import HTTPException
+from fastapi.templating import Jinja2Templates
 
 
 # база данных
@@ -16,7 +17,7 @@ import sqlite3
 
 
 # pydentic схемы
-from schemes import Form, Token
+from schemes import Form, Token, Post
 
 
 
@@ -36,6 +37,10 @@ app = FastAPI()
 
 # путь к статическим файлам таким как CSS
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+templates = Jinja2Templates(directory="pages")
+
 
 # отправка любой найденной ошибки FastAPI
 @app.exception_handler(HTTPException)
@@ -97,7 +102,11 @@ def to_support():
 @app.get("/forum", tags=["lincs"], response_class=HTMLResponse)
 def to_support(request: Request):
     context = get_posts(request)
-    return templates.TemplatesResponse("pages/forum.html", context)
+    return templates.TemplateResponse("forum.html", context)
+
+@app.get("/comments", tags=["lincs"])
+def root():
+    return FileResponse("pages/comments.html")
 
 
 
@@ -167,7 +176,7 @@ def check_token(data: Token):
     return {"status": "ok"}, username
 
 
-app.post("/add_post")
+@app.post("/add_post")
 def add_post(data: Post):
     con, cursor = conectDB()
 
@@ -179,7 +188,7 @@ def add_post(data: Post):
         ''',
         (data.content, username)
     )
-
+    
     con.commit()
     con.close()
 
@@ -197,8 +206,9 @@ def get_posts(request):
     for i in range(len(posts)):
         context["posts"].append(
             {
-                "content": [1],
-                "username": [2]
+                "id": posts[i][0],
+                "content": posts[i][1],
+                "username": posts[i][2]
             }
         )
 
