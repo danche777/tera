@@ -43,14 +43,12 @@ async function signUp() {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-        username: username.value,
-        password: password.value
+            username: username.value,
+            password: password.value
         })
     });
 
     if (response.ok){
-        // const data = await response.json();
-        // localStorage.setItem("token", data.access_token);
         window.location.href = "/";
     } else {
         const data = await response.json();

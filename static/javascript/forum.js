@@ -118,9 +118,23 @@ postButton.addEventListener("click", (e) => {
 });
 
 
-
-const commentButton = document.querySelector(".comments_button");
-
-commentButton.onclick = function () {
-    window.location.href = "/comments";
-}
+// открытие комментариев
+const commentButtons = document.querySelectorAll(".comments_button");
+commentButtons.forEach(button => {
+    button.onclick = function () {
+        const postId = this.id; // ID кнопки совпадает с ID поста
+        const postContainer = this.closest('.item_forum');
+        const contentElement = postContainer.querySelector('.content_item_forum');
+        const usernameElement = postContainer.querySelector('.username');
+        if (postId && contentElement) {
+            const postId = this.id;
+            const postContent = contentElement.textContent;
+            const postUsername = usernameElement.textContent;
+            localStorage.setItem("postContent", postContent);
+            localStorage.setItem("postUsername", postUsername);
+            localStorage.setItem("postId", postId);
+            alert(postContent + postUsername + postId);
+            window.location.href = `/comments/${postId}`;
+        }
+    };
+});

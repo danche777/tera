@@ -9,13 +9,41 @@
 <body>
     <header>
         <a href="/"><div class="header_item"><span>TErA</span></div></a>
-        <div>
-            <div class="strt_post_button">NeW poSt beta</div>
-        </div>
     </header>
 
     <div class="comments_body">
-        asdasd
+        <div class="item_forum">
+            <div class="content_item_forum">...</div>
+            <div class="objects_item_forun">
+                <div style=" display: flex; flex-direction: row; gap: 20px;">
+                        <img
+                        class="upvoute_button"
+                        src="../static/svg/arrow-up-svgrepo-com.svg"
+                        alt="arrow-up"
+                        >
+                        <img
+                        class="downvote_button"
+                        src="../static/svg/arrow-down-svgrepo-com.svg" 
+                        alt="arrow-down" 
+                        style="width: 50%;"
+                        >
+                </div>
+                <div style=" display: flex; flex-direction: row; gap: 40px">
+                    <div class="username"></div>
+                </div>
+            </div>
+            <input type="text" id="comment_content">
+            <button class="submit_comment_button">Submit</button>
+            {% for item in comments %}
+            <div class="comment_item">
+                <div class="comment_info">
+                    <div class="comment_username">{{ item["username"] }}</div>
+                </div>
+                <div class="comment_content">{{ item["content"] }}</div>
+            </div><br>
+            {% endfor %}
+        </div>
     </div>
+    <script src="../static/javascript/comment.js"></script>
 </body>
 </html>

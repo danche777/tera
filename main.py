@@ -17,7 +17,7 @@ import sqlite3
 
 
 # pydentic схемы
-from schemes import Form, Token, Post
+from schemes import Form, Token, Post, Coment
 
 
 
@@ -77,6 +77,18 @@ def conectDB():
         );
         '''
     )
+
+    cursor.execute(
+        '''
+        CREATE TABLE IF NOT EXISTS comments(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            content TEXT,
+            username VARCHAR(16),
+            post_id DEFUELT NULL,
+            FOREIGN KEY (post_id) REFERENCES posts(id)
+        );
+        '''
+    )
     return con, cursor
 
 
@@ -100,13 +112,14 @@ def to_support():
     return FileResponse("pages/info.html")
 
 @app.get("/forum", tags=["lincs"], response_class=HTMLResponse)
-def to_support(request: Request):
+def to_forum(request: Request):
     context = get_posts(request)
     return templates.TemplateResponse("forum.html", context)
 
-@app.get("/comments", tags=["lincs"])
-def root():
-    return FileResponse("pages/comments.html")
+@app.get("/comments/{post_id}", tags=["lincs"], response_class=HTMLResponse)
+def to_comments(request: Request):
+    context = get_comments(request)
+    return templates.TemplateResponse("comments.html", context)
 
 
 
@@ -192,6 +205,22 @@ def add_post(data: Post):
     con.commit()
     con.close()
 
+@app.post("/add_comment")
+def add_post(data: Coment):
+    con, cursor = conectDB()
+
+    payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    username = payload["sub"]
+    cursor.execute(
+        '''
+        INSERT INTO comments (content, username, post_id) VALUES (?, ?, ?)
+        ''',
+        (data.comment, username, data.post_id)
+    )
+    
+    con.commit()
+    con.close()
+
 def get_posts(request):
     con, cursor = conectDB()
     posts = cursor.execute(
@@ -214,7 +243,32 @@ def get_posts(request):
 
     return context
 
+def get_comments(request):
+    con, cursor = conectDB()
+    coments = cursor.execute(
+        """
+        SELECT * FROM comments
+        JOIN posts ON comments.post_id = posts.id
+        ORDER BY id DESC
+        """
+    ).fetchall()
 
+    context = {
+        "request": request,
+        "comments": []
+    }
+
+    for i in range(len(coments)):
+        context["comments"].append(
+            {
+                "id": coments[i][0],
+                "content": coments[i][1],
+                "username": coments[i][2],
+                "post_id": coments[i][3]
+            }
+        )
+
+    return context
 
 
 # запуск веб приложения

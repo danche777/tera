@@ -400,16 +400,43 @@ button:active {
     padding: 10px;
 }
 
-.upvoute_button, .downvote_button {
-    /* background-color: blue; */
-    border: #1a1a1a52 solid 1px;
-    border-radius: 20px;
-    position: relative;
-    width: 50px;
-    height: 50px;
-    transition-duration: 0.4s;
-    padding: 12px;
+.hidden_radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
+
+.radio_button::before {
+    content: "";
+    display: inline-block;
+    width: 40px;
+    height: 50px;
+    border-radius: 100% 100% 0 0;
+    border: 0px solid #ccc;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.hidden_radio:checked + .radio_button::before {
+  background: #ccc;
+}
+
+.radio_button:hover::before {
+    background-color: #707070;
+}
+
+.hidden_radio:disabled + .radio_button {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+.hidden_radio:disabled + .radio_button::before {
+    background-color: #f0f0f0;
+    border-color: #ddd;
+}
+
 
 .username, .comments_button {
     border-radius: 20px;
@@ -425,10 +452,7 @@ button:active {
     background-color: #00000063;
 }
 
-.upvoute_button:hover, 
-.downvote_button:hover {
-    background-color: #00000063;
-}
+
 
 .strt_post_button {
     /* border: #1a1a1a52 solid 1px; */
@@ -563,5 +587,15 @@ button:active {
 .comments_body {
     display: flex;
     flex-direction: column;
-    margin: 30px 10px 30px 0;
+    margin: 10px 40px 0px 40px;
+}
+
+.comment_info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.comment_content {
+    
 }

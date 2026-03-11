@@ -10,3 +10,8 @@ class Token(BaseModel):
 class Post(BaseModel):
     access_token: str
     content: str
+
+class Coment(BaseModel):
+    access_token: str
+    post_id: str
+    comment: str
