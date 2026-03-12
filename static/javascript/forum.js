@@ -114,7 +114,6 @@ function showCreatePostModal() {
 postButton.addEventListener("click", (e) => {
     e.preventDefault();
     showCreatePostModal();
-    
 });
 
 
@@ -122,19 +121,90 @@ postButton.addEventListener("click", (e) => {
 const commentButtons = document.querySelectorAll(".comments_button");
 commentButtons.forEach(button => {
     button.onclick = function () {
-        const postId = this.id; // ID кнопки совпадает с ID поста
+        const Id = this.id; // ID кнопки совпадает с ID поста
         const postContainer = this.closest('.item_forum');
         const contentElement = postContainer.querySelector('.content_item_forum');
         const usernameElement = postContainer.querySelector('.username');
-        if (postId && contentElement) {
+        if (Id && contentElement) {
             const postId = this.id;
             const postContent = contentElement.textContent;
             const postUsername = usernameElement.textContent;
             localStorage.setItem("postContent", postContent);
             localStorage.setItem("postUsername", postUsername);
             localStorage.setItem("postId", postId);
-            alert(postContent + postUsername + postId);
             window.location.href = `/comments/${postId}`;
         }
     };
 });
+
+
+async function like(postId) {
+    const token = localStorage.getItem("token")
+    const like = 1
+    const dislike = 0
+    const response = await fetch("/add_reaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            post_id: postId,
+            access_token: token,
+            reaction: [like, dislike]
+        })
+    });
+
+    if (!response.ok) {
+        alert('error')
+    } else (
+        alert('ok')
+    )
+};
+
+async function dislike(postId) {
+    const token = localStorage.getItem("token")
+    const like = 0
+    const dislike = 1
+    const response = await fetch("/add_reaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            post_id: postId,
+            access_token: token,
+            reaction: [like, dislike]
+        })
+    });
+
+    if (!response.ok) {
+        alert('error')
+    } else (
+        alert('ok')
+    )
+};
+
+
+// лайк
+const upvouteButton = document.querySelectorAll("#upvoute");   
+upvouteButton.forEach(button => {
+    button.onclick = function () {
+        const postId = this.name; // ID кнопки совпадает с ID поста
+        const postContainer = this.closest('.item_forum');
+        const contentElement = postContainer.querySelector('.upvoute_button');
+        // const usernameElement = postContainer.querySelector('.username');
+        if (postId && contentElement) {
+            like(postId)
+        }
+    };
+});
+
+// дизлайк
+const downvouteButton = document.querySelectorAll("#downvoute");   
+downvouteButton.forEach(button => {
+    button.onclick = function () {
+        const postId = this.name; // ID кнопки совпадает с ID поста
+        const postContainer = this.closest('.item_forum');
+        const contentElement = postContainer.querySelector('.upvoute_button');
+        if (postId && contentElement) {
+            dislike(postId)
+        }
+    };
+});
+

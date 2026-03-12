@@ -21,10 +21,14 @@
                 <div class="content_item_forum">{{ item["content"] }}</div>
                 <div class="objects_item_forun">
                     <div style=" display: flex; flex-direction: row; gap: 20px;">
-                        <input type="radio" class="hidden_radio" id="option1" name="{{ item['id'] }}">
-                        <label for="option1" class="radio_button"></label>
-                        <input type="radio" class="hidden_radio" id="option2" name="{{ item['id'] }}">
-                        <label for="option2" class="radio_button" style="rotate: 180deg;"></label>
+                    <div style=" display: flex; flex-direction: row; gap: 20px;">
+                        <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
+                            <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
+                        </button>
+                        <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
+                            <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
+                        </button>
+                    </div>
                     </div>
                     <div style=" display: flex; flex-direction: row; gap: 40px">
                         <div class="username">{{ item["username"] }}</div>
@@ -32,8 +36,9 @@
                     </div>
                 </div>
             </div>
-            {% endfor %}
+            {% endfor %}    
     </div>
 <script src="../static/javascript/forum.js"></script>
 </body>
 </html>
+

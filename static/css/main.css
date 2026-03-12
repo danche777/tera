@@ -400,7 +400,12 @@ button:active {
     padding: 10px;
 }
 
-.hidden_radio {
+.upvoute_button,
+.downvoute_button {
+    width: 50px;
+    height: 50px;
+}
+/* .hidden_radio {
     position: absolute;
     opacity: 0;
     width: 0;
@@ -435,7 +440,7 @@ button:active {
 .hidden_radio:disabled + .radio_button::before {
     background-color: #f0f0f0;
     border-color: #ddd;
-}
+} */
 
 
 .username, .comments_button {

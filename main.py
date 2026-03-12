@@ -17,7 +17,7 @@ import sqlite3
 
 
 # pydentic схемы
-from schemes import Form, Token, Post, Coment
+from schemes import Form, Token, Post, Coment, Reaction
 
 
 
@@ -89,6 +89,20 @@ def conectDB():
         );
         '''
     )
+
+    cursor.execute(
+        '''
+        CREATE TABLE IF NOT EXISTS reactions(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            post_id INT,
+            username VARCHAR(16),
+            like DEFUELT NULL,
+            dislike DEFUELT NULL,
+            FOREIGN KEY (post_id) REFERENCES posts(id)
+        );
+        '''
+    )
+
     return con, cursor
 
 
@@ -201,6 +215,12 @@ def add_post(data: Post):
         ''',
         (data.content, username)
     )
+    cursor.execute(
+        '''
+        INSERT INTO reactions (post_id, username) VALUES (?, ?)
+        ''',
+        (data.content, username)
+    )
     
     con.commit()
     con.close()
@@ -221,12 +241,34 @@ def add_post(data: Coment):
     con.commit()
     con.close()
 
+@app.post("/add_reaction")
+def add_post(data: Reaction):
+    con, cursor = conectDB()
+
+    payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    username = payload["sub"]
+    cursor.execute(
+        '''
+        INSERT INTO reactions (username, post_id, like, dislike) VALUES (?, ?, ?, ?)
+        ''',
+        (username, data.post_id, data.reaction[0], data.reaction[1],) 
+    )
+    
+    con.commit()
+    con.close()
+
 def get_posts(request):
     con, cursor = conectDB()
     posts = cursor.execute(
-        "SELECT * FROM posts"
+        """
+        SELECT posts.id, posts.content, posts.username, (SUM(reactions.like) - SUM(reactions.dislike)) as total FROM posts
+        LEFT JOIN reactions
+        ON posts.id = reactions.post_id
+        GROUP BY posts.id
+        ORDER BY total DESC
+        """
     ).fetchall()
-
+    print(posts)
     context = {
         "request": request,
         "posts": []
@@ -249,16 +291,18 @@ def get_comments(request):
         """
         SELECT * FROM comments
         JOIN posts ON comments.post_id = posts.id
+        WHERE posts.id = comments.post_id AND posts.id = ?
         ORDER BY id DESC
-        """
+        """, (request.path_params["post_id"],)
     ).fetchall()
-
+    print(request.path_params["post_id"])
     context = {
         "request": request,
         "comments": []
     }
 
     for i in range(len(coments)):
+        print(coments[i])
         context["comments"].append(
             {
                 "id": coments[i][0],

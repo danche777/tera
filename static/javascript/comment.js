@@ -1,6 +1,8 @@
 const postContent = document.querySelector(".content_item_forum")
 const postUsername = document.querySelector(".username")
+const item_forum = document.querySelector(".item_forum")
 
+item_forum.id = localStorage.getItem("postId")
 postContent.textContent = localStorage.getItem("postContent")
 postUsername.textContent = localStorage.getItem("postUsername")
 
