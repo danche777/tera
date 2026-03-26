@@ -404,57 +404,34 @@ button:active {
 .downvoute_button {
     width: 50px;
     height: 50px;
-}
-/* .hidden_radio {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
+    background-color: transparent;
+    border: none;
+    transition: 0.4s;
 }
 
-.radio_button::before {
-    content: "";
-    display: inline-block;
-    width: 40px;
-    height: 50px;
-    border-radius: 100% 100% 0 0;
-    border: 0px solid #ccc;
-    background: white;
-    transition: all 0.2s ease;
+.upvoute_button:hover,
+.downvoute_button:hover {
+    background-color: #00000063;
+    border-radius: 20px;
 }
-
-.hidden_radio:checked + .radio_button::before {
-  background: #ccc;
-}
-
-.radio_button:hover::before {
-    background-color: #707070;
-}
-
-.hidden_radio:disabled + .radio_button {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-
-.hidden_radio:disabled + .radio_button::before {
-    background-color: #f0f0f0;
-    border-color: #ddd;
-} */
-
 
 .username, .comments_button {
-    border-radius: 20px;
     padding: 10px;
     font-size: 20px;
     font-family: 'SpaceGrotesk';
-    /* text-align: center; */
     justify-items: center;
     align-items: center;
 }
 
+.comments_button {
+    background-color: transparent;
+    border: none;
+    transition: 0.4s;
+}
+
 .comments_button:hover {
     background-color: #00000063;
+    border-radius: 20px;
 }
 
 
@@ -462,6 +439,7 @@ button:active {
 .strt_post_button {
     /* border: #1a1a1a52 solid 1px; */
     transition-duration: 0.4s;
+    transition-delay: 0.2s;
 
 }
 
@@ -470,23 +448,39 @@ button:active {
     box-shadow: #0000007e 5px 5px 20px 0px;
                 /* inset #0000005b 0 0 20px 0px; */
     border-radius: 20px;
-    animation: shake 2s infinite both;
+    animation: float 2s infinite both;
     cursor: pointer;
 }
 
-@keyframes shake {
+@keyframes float {
     0%, 100% {
-        rotate: 0deg;
+        transform:translateY(0px);
         background-color: #00000000;
     }
-    10%, 30%, 50%, 70%, 90% {
-        rotate: 5deg;
-        background-color: #ffffff;
+    50% {
+        transform:translateY(-5px);
+        background-color: #ffffff5e;
     }
-    20%, 40%, 60%, 80% {
-        rotate: -5deg;
-        background-color: #ff0000;
+    80% {
+        transform: translateY(5px);
+        background-color: #919191;
     }
+}
+
+/* ==================== REACTS ==================== */
+
+.reacts {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.forum_reacts_count {
+    font-size: 18px;
+    font-family: 'SpaceGrotesk';
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ==================== CREATE POST /FORUM ==================== */
@@ -601,6 +595,68 @@ button:active {
     justify-content: space-between;
 }
 
-.comment_content {
+.comment_input {
+    text-wrap: wrap;
+    margin: 1%;
+    width: 30%;
+    border-radius: 20px;
+    border: rgba(0, 0, 0, 0.356) solid 2px;
+    padding: 10px;
+    font-size: 18px;
+    background: radial-gradient(
+        circle 30px at left, 
+        #ebebeb00 0%, 
+        #535353 4000%
+    );
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition-duration: 0.3s;
+}
+
+.comment_input:focus {
+    outline: none;
+    box-shadow: 0 5px 10px rgba(83, 83, 83, 0.5), inset 0 0 10px rgba(83, 83, 83, 0.342);
+    width: 40%;
+    height: 100px;
     
+}
+
+.submit_comment_button {
+    width: 20%;
+    margin: 1%;
+    background-color: #007bff;
+    font-size: 150%;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    float: left;
+    transition: all 0.3s ease;
+}
+
+
+.submit_comment_button:hover {
+    background-color: #0056b3;
+}
+
+.comment_item {
+    margin: 1%;
+    min-width: 100px;
+    max-width: 300px;
+    border: #1a1a1a52 solid 1px;
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 18px;
+    font-family: 'SpaceGrotesk';
+}
+
+.comment_username {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.comment_content {
+    width: 100%;
+    text-wrap: wrap;
+    word-wrap: break-word;
 }

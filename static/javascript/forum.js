@@ -155,7 +155,7 @@ async function like(postId) {
     if (!response.ok) {
         alert('error')
     } else (
-        alert('ok')
+        location.reload()
     )
 };
 
@@ -176,7 +176,7 @@ async function dislike(postId) {
     if (!response.ok) {
         alert('error')
     } else (
-        alert('ok')
+        location.reload()
     )
 };
 

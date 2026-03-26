@@ -16,24 +16,22 @@
             <div class="content_item_forum"></div>
             <div class="objects_item_forun">
                 <div style=" display: flex; flex-direction: row; gap: 20px;">
-                        <img
-                        class="upvoute_button"
-                        src="../static/svg/arrow-up-svgrepo-com.svg"
-                        alt="arrow-up"
-                        >
-                        <img
-                        class="downvote_button"
-                        src="../static/svg/arrow-down-svgrepo-com.svg" 
-                        alt="arrow-down" 
-                        style="width: 50%;"
-                        >
+                    <button class="upvoute_button" id="upvoute">
+                        <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
+                    </button>
+                    <button  class="downvoute_button" id="downvoute">
+                        <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
+                    </button>
                 </div>
                 <div style=" display: flex; flex-direction: row; gap: 40px">
                     <div class="username"></div>
                 </div>
             </div>
-            <input type="text" id="comment_content">
-            <button class="submit_comment_button">Submit</button>
+            <div style="display: flex; flex-direction: column;">
+                <textarea type="text" id="comment_content" class="comment_input" placeholder="Write a comment..." value="asdasdasdasdasdasdasdasdasdasd" maxlength="200"></textarea>
+                <button class="submit_comment_button">Submit</button>
+            </div>
+            
             {% for item in comments %}
             <div class="comment_item">
                 <div class="comment_info">

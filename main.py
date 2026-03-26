@@ -261,7 +261,13 @@ def get_posts(request):
     con, cursor = conectDB()
     posts = cursor.execute(
         """
-        SELECT posts.id, posts.content, posts.username, (SUM(reactions.like) - SUM(reactions.dislike)) as total FROM posts
+        SELECT
+        posts.id, 
+        posts.content,
+        posts.username,
+        SUM(reactions.like),
+        SUM(reactions.dislike),
+        (SUM(reactions.like) - SUM(reactions.dislike)) as total FROM posts
         LEFT JOIN reactions
         ON posts.id = reactions.post_id
         GROUP BY posts.id
@@ -279,7 +285,9 @@ def get_posts(request):
             {
                 "id": posts[i][0],
                 "content": posts[i][1],
-                "username": posts[i][2]
+                "username": posts[i][2],
+                "likes_count": posts[i][3] if posts[i][3] else 0,
+                "dislikes_count": posts[i][4] if posts[i][4] else 0
             }
         )
 
