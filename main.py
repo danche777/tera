@@ -149,7 +149,7 @@ async def auth(data: Form):
         (data.username,)
     ).fetchall()
 
-    print(cursor.execute("select username, password from users").fetchall())
+    (cursor.execute("select username, password from users").fetchall())
 
     if not user:
         raise HTTPException(status_code=400, detail="username not found")
@@ -177,7 +177,7 @@ async def reg(data: Form):
     ).fetchall()
     con.commit()
     
-    print(username, data.username)
+    (username, data.username)
     if username:
         raise HTTPException(status_code=400, detail="username already exists")
     cursor.execute(
@@ -195,11 +195,11 @@ def check_token(data: Token):
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     expires_at = payload["exp"]
     username = payload["sub"]
-    print(expires_at, username)
-    print(time.time() >= expires_at)
+    (expires_at, username)
+    (time.time() >= expires_at)
     if time.time() >= expires_at:
         raise HTTPException(detail="Token expired", status_code=404)
-    print(data.access_token)
+    (data.access_token)
     return {"status": "ok"}, username
 
 
@@ -274,7 +274,7 @@ def get_posts(request):
         ORDER BY total DESC
         """
     ).fetchall()
-    print(posts)
+    (posts)
     context = {
         "request": request,
         "posts": []
@@ -303,14 +303,14 @@ def get_comments(request):
         ORDER BY id DESC
         """, (request.path_params["post_id"],)
     ).fetchall()
-    print(request.path_params["post_id"])
+    (request.path_params["post_id"])
     context = {
         "request": request,
         "comments": []
     }
 
     for i in range(len(coments)):
-        print(coments[i])
+        (coments[i])
         context["comments"].append(
             {
                 "id": coments[i][0],

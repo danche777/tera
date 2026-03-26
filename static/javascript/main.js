@@ -62,6 +62,7 @@ animate();
 
 // перемеенные для изменения страницы
 const getStartButton = document.getElementById("start")
+const logoutButton = document.getElementsByClassName("logout_btn")
 
 // изменение пути
 function swapPageTo(link) {
@@ -74,9 +75,9 @@ function swapPageTo(link) {
 document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("token");
     if (!token) {
-        swapPageTo('/sign_in');
-    } else {
+        // скрыть кнопку logout, если пользователь не авторизован
         swapPageTo('/forum');
+        logoutButton[0].style.display = "none";
         const response = await fetch("/check_token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -89,6 +90,17 @@ document.addEventListener("DOMContentLoaded", async function () {
             localStorage.removeItem("token");
             swapPageTo('/sign_in');
         }
+    } else {
+        swapPageTo('/forum');
     }
     
 });
+
+
+function logout() {
+    const token = localStorage.getItem("token");
+    if (token) {
+        localStorage.removeItem("token");
+        location.reload();
+    }
+}
