@@ -17,7 +17,7 @@ import sqlite3
 
 
 # pydentic схемы
-from schemes import Form, Token, Post, Coment, Reaction
+from schemes import Form, Token, Post, Coment, Reaction, DeletePost
 
 
 
@@ -135,7 +135,10 @@ def to_comments(request: Request):
     context = get_comments(request)
     return templates.TemplateResponse("comments.html", context)
 
-
+@app.get("/account/{username}", tags=["lincs"], response_class=HTMLResponse)
+def to_account(request: Request):
+    context = get_personal_posts(request)
+    return templates.TemplateResponse("account.html", context)
 
 # авторизация формы
 @app.post("/auth")
@@ -189,7 +192,7 @@ async def reg(data: Form):
     con.commit()
     con.close()
 
-
+# проверка токена на валидность и срок годности
 @app.post("/check_token")
 def check_token(data: Token):
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -202,7 +205,7 @@ def check_token(data: Token):
     (data.access_token)
     return {"status": "ok"}, username
 
-
+# добавление поста
 @app.post("/add_post")
 def add_post(data: Post):
     con, cursor = conectDB()
@@ -225,6 +228,7 @@ def add_post(data: Post):
     con.commit()
     con.close()
 
+# добавление комментария
 @app.post("/add_comment")
 def add_post(data: Coment):
     con, cursor = conectDB()
@@ -241,6 +245,7 @@ def add_post(data: Coment):
     con.commit()
     con.close()
 
+# реакция на пост (лайк или дизлайк)
 @app.post("/add_reaction")
 def add_post(data: Reaction):
     con, cursor = conectDB()
@@ -257,6 +262,35 @@ def add_post(data: Reaction):
     con.commit()
     con.close()
 
+@app.delete("/delete_post/{post_id}")
+def delete_post(data: DeletePost):
+    con, cursor = conectDB()
+
+    post_id = data.post_id
+    print(f"{post_id} - post_id @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    cursor.execute(
+        '''
+        DELETE FROM posts WHERE id = ?
+        ''',
+        (post_id,)
+    )
+    cursor.execute(
+        '''
+        DELETE FROM reactions WHERE post_id = ?
+        ''',
+        (post_id,)
+    )
+    cursor.execute(
+        '''
+        DELETE FROM comments WHERE post_id = ?
+        ''',
+        (post_id,)
+    )
+    
+    con.commit()
+    con.close()
+
+# получение всех постов с количеством лайков и дизлайков
 def get_posts(request):
     con, cursor = conectDB()
     posts = cursor.execute(
@@ -293,6 +327,41 @@ def get_posts(request):
 
     return context
 
+# получение всех постов конкретного пользователя с количеством лайков и дизлайков
+def get_personal_posts(request):
+    con, cursor = conectDB()
+    posts = cursor.execute(
+        """
+        SELECT
+        posts.id,
+        posts.content,
+        posts.username,
+        SUM(reactions.like),
+        SUM(reactions.dislike)
+        FROM posts 
+        LEFT JOIN reactions ON posts.id = reactions.post_id
+        WHERE posts.username = ?
+        GROUP BY posts.id
+        """, (request.path_params["username"],)
+    ).fetchall()
+    context = {
+        "request": request,
+        "posts": []
+    }
+    
+    for i in range(len(posts)):
+        context["posts"].append(
+            {
+                "id": posts[i][0],
+                "content": posts[i][1],
+                "username": posts[i][2],
+                "likes_count": posts[i][3],
+                "dislikes_count": posts[i][4]
+            }
+        )
+    return context
+
+# получение всех комментариев к конкретному посту
 def get_comments(request):
     con, cursor = conectDB()
     coments = cursor.execute(

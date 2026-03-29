@@ -93,7 +93,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     } else {
         swapPageTo('/forum');
     }
-    
 });
 
 
@@ -104,3 +103,13 @@ function logout() {
         location.reload();
     }
 }
+
+async function account(username) {
+    const response = await fetch("/check_token", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+            access_username: username
+        })
+    });
+};
