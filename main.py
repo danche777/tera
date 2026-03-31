@@ -251,13 +251,50 @@ def add_post(data: Reaction):
     con, cursor = conectDB()
 
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    
     username = payload["sub"]
-    cursor.execute(
-        '''
-        INSERT INTO reactions (username, post_id, like, dislike) VALUES (?, ?, ?, ?)
-        ''',
-        (username, data.post_id, data.reaction[0], data.reaction[1],) 
-    )
+    post_id = data.post_id
+    like = data.reaction[0]
+    dislike = data.reaction[1]
+
+    reaction_state = cursor.execute(
+        """
+        SELECT
+            like,
+            dislike
+        FROM reactions
+        WHERE username = ? AND post_id = ?
+        """,
+        (username, post_id,)
+    ).fetchall()
+
+    
+
+    print(f'username: {username} {reaction_state}')
+    # print(reaction_state[0][0], like, reaction_state[0][1], dislike)
+    print(reaction_state == [])
+    if reaction_state == []:
+        cursor.execute(
+            '''
+            INSERT INTO reactions (username, post_id, like, dislike) VALUES (?, ?, ?, ?)
+            ''',
+            (username, post_id, like, dislike,) 
+        )
+    elif reaction_state[0][0] == like and reaction_state[0][1] == dislike:
+        cursor.execute(
+            '''
+            DELETE FROM reactions WHERE username = ? AND post_id = ?
+            ''',
+        (username, post_id,)
+        )
+    else:
+        cursor.execute(
+            '''
+            UPDATE reactions SET like = ?, dislike = ? WHERE username = ? AND post_id = ?
+            ''',
+            (like, dislike, username, post_id,)
+        )
+
     
     con.commit()
     con.close()
@@ -267,7 +304,6 @@ def delete_post(data: DeletePost):
     con, cursor = conectDB()
 
     post_id = data.post_id
-    print(f"{post_id} - post_id @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     cursor.execute(
         '''
         DELETE FROM posts WHERE id = ?
@@ -296,19 +332,17 @@ def get_posts(request):
     posts = cursor.execute(
         """
         SELECT
-        posts.id, 
-        posts.content,
-        posts.username,
-        SUM(reactions.like),
-        SUM(reactions.dislike),
-        (SUM(reactions.like) - SUM(reactions.dislike)) as total FROM posts
+            posts.id, 
+            posts.content,
+            posts.username,
+            COALESCE(SUM(reactions.like) - SUM(reactions.dislike), 0) as total
+        FROM posts
         LEFT JOIN reactions
         ON posts.id = reactions.post_id
         GROUP BY posts.id
         ORDER BY total DESC
         """
     ).fetchall()
-    (posts)
     context = {
         "request": request,
         "posts": []
@@ -320,11 +354,10 @@ def get_posts(request):
                 "id": posts[i][0],
                 "content": posts[i][1],
                 "username": posts[i][2],
-                "likes_count": posts[i][3] if posts[i][3] else 0,
-                "dislikes_count": posts[i][4] if posts[i][4] else 0
+                "total": posts[i][3],
             }
         )
-
+    print('total', posts[i][3])
     return context
 
 # получение всех постов конкретного пользователя с количеством лайков и дизлайков
@@ -333,11 +366,11 @@ def get_personal_posts(request):
     posts = cursor.execute(
         """
         SELECT
-        posts.id,
-        posts.content,
-        posts.username,
-        SUM(reactions.like),
-        SUM(reactions.dislike)
+            posts.id,
+            posts.content,
+            posts.username,
+            SUM(reactions.like),
+            SUM(reactions.dislike)
         FROM posts 
         LEFT JOIN reactions ON posts.id = reactions.post_id
         WHERE posts.username = ?
