@@ -136,8 +136,8 @@ def to_comments(request: Request):
     return templates.TemplateResponse("comments.html", context)
 
 @app.get("/account/{username}", tags=["lincs"], response_class=HTMLResponse)
-def to_account(request: Request):
-    context = get_personal_posts(request)
+def to_account(request: Request, username: str):
+    context = get_personal_posts(request, username)
     return templates.TemplateResponse("account.html", context)
 
 # авторизация формы
@@ -361,7 +361,7 @@ def get_posts(request):
     return context
 
 # получение всех постов конкретного пользователя с количеством лайков и дизлайков
-def get_personal_posts(request):
+def get_personal_posts(request, username):
     con, cursor = conectDB()
     posts = cursor.execute(
         """
@@ -379,7 +379,8 @@ def get_personal_posts(request):
     ).fetchall()
     context = {
         "request": request,
-        "posts": []
+        "posts": [],
+        "username": username
     }
     
     for i in range(len(posts)):
@@ -387,7 +388,7 @@ def get_personal_posts(request):
             {
                 "id": posts[i][0],
                 "content": posts[i][1],
-                "username": posts[i][2],
+                "username": username,
                 "likes_count": posts[i][3],
                 "dislikes_count": posts[i][4]
             }

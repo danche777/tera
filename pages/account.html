@@ -18,9 +18,10 @@
     </header>
     <div class="account_body">
             <h1>Account</h1>
-                <img src="../static/images/profile.png" class="account_profile_image">
+
                 <div class="account_info">
-                    <p>Username: <span id="account_username" style="font-size: 20px; font-weight: bold;">{{ posts[0]['username'] }}</span></p>
+                    <img src="../static/image/profile.png" class="account_profile_image">
+                    <span id="account_username" style="font-size: 20px; font-weight: bold; text-align: center;">{{ username }}</span>
                 </div>
                 <div class="account_users_posts">
                     <h2>Posts</h2>
@@ -29,16 +30,15 @@
                         <div class="item_forum" id="{{ item['id'] }}">
                             <div class="content_item_forum">{{ item["content"] }}</div>
                             <div class="objects_item_forun">
-                                <div style=" display: flex; flex-direction: row; gap: 20px;">
-                                    <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
-                                        <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
-                                    </button>
-                                    <div class="forum_reacts_count">{{ item["likes_count"] }}</div>
-                                    <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
-                                        <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
-                                    </button>
-                                    <div class="forum_reacts_count">{{ item["dislikes_count"] }}</div>
-                                </div>
+<!--                                <div style=" display: flex; flex-direction: row; gap: 20px;">-->
+<!--                                    <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">-->
+<!--                                        <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">-->
+<!--                                    </button>-->
+<!--                                    <div class="forum_reacts_count">{{ item["likes_count"] }}</div>-->
+<!--                                    <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">-->
+<!--                                        <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">-->
+<!--                                    </button>-->
+<!--                                </div>-->
                                 <div style=" display: flex; flex-direction: row; gap: 40px">
                                     <button class="account_delete_button">delete</button>
                                     <button class="comments_button" id="{{ item['id'] }}">comments</button>

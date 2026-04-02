@@ -65,7 +65,7 @@ header div {
     padding: 10px 40px;
 }
 
-.logout_btn {
+.logout_btn, .account_btn {
     background-color: transparent;
     border: none;
     font-size: 18px;
@@ -75,7 +75,8 @@ header div {
     border-radius: 20px;
 }
 
-.logout_btn:hover {
+.logout_btn:hover,
+.account_btn:hover {
     background-color: rgba(0, 0, 0, 0.589);
     box-shadow: 0 0 40px rgb(0, 0, 0);
 }

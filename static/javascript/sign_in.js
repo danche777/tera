@@ -52,7 +52,8 @@ async function auth() {
     // проверка ответа с стороны FastAPI
     if (response.ok) {
     const data = await response.json();
-    localStorage.setItem("token", data.access_token); // получение токена
+    localStorage.setItem("token", data.access_token); // сохронение токена
+    localStorage.setItem("username", username.value)
     window.location.href = "/"; // перенос  на главную страницу
     } else {
     const data = await response.json();

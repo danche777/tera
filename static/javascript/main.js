@@ -62,7 +62,7 @@ animate();
 
 // перемеенные для изменения страницы
 const getStartButton = document.getElementById("start")
-const logoutButton = document.getElementsByClassName("logout_btn")
+const AccountButton = document.getElementsByClassName("account_btn")
 
 // изменение пути
 function swapPageTo(link) {
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (!token) {
         // скрыть кнопку logout, если пользователь не авторизован
         swapPageTo('/forum');
-        logoutButton[0].style.display = "none";
+        AccountButton[0].style.display = "none";
         const response = await fetch("/check_token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -95,21 +95,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
-
-function logout() {
-    const token = localStorage.getItem("token");
-    if (token) {
-        localStorage.removeItem("token");
-        location.reload();
-    }
-}
-
-async function account(username) {
-    const response = await fetch("/check_token", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-            access_username: username
-        })
-    });
+function account() {
+    const username = localStorage.getItem("username");
+    location.href = `/account/${username}`
 };
