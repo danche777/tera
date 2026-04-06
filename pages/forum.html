@@ -20,7 +20,8 @@
             <div class="item_forum" id="{{ item['id'] }}">
                 <div class="content_item_forum">{{ item["content"] }}</div>
                 <div class="objects_item_forun">
-                    <div style=" display: flex; flex-direction: row; gap: 20px;">
+                    {% if item["personal_reaction"] == "like" %}
+                    <div style=" display: flex; flex-direction: row; gap: 20px; border-radius: 20px; background-color: rgb(235, 132, 132);">
                         <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
                             <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
                         </button>
@@ -29,6 +30,27 @@
                             <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
                         </button>
                     </div>
+                    {% elif item["personal_reaction"] == "dislike" %}
+                    <div style=" display: flex; flex-direction: row; gap: 20px; border-radius: 20px; background-color: rgb(146, 144, 255);">
+                        <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
+                            <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
+                        </button>
+                        <div class="forum_reacts_count">{{ item["total"] }}</div>
+                        <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
+                            <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
+                        </button>
+                    </div>
+                    {% else %}
+                    <div style=" display: flex; flex-direction: row; gap: 20px; border-radius: 20px;">
+                        <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
+                            <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
+                        </button>
+                        <div class="forum_reacts_count">{{ item["total"] }}</div>
+                        <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
+                            <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
+                        </button>
+                    </div>
+                    {% endif %}
                     <div style=" display: flex; flex-direction: row; gap: 40px">
                         <div class="username">{{ item["username"] }}</div>
                         <button class="comments_button" id="{{ item['id'] }}">comments</button>
@@ -38,6 +60,7 @@
             {% endfor %}
     </div>
 <script src="../static/javascript/forum.js"></script>
+<script src="../static/javascript/check_token.js"></script>
 </body>
 </html>
 

@@ -3,6 +3,7 @@ const cards = document.querySelectorAll('.card');
 const indicator = document.getElementById('indicator');
 const container = document.getElementById('container');
 
+indicator.classList.add('hidden');
 
 /* Физика движения */
 let currentX = 0;
@@ -74,9 +75,8 @@ function swapPageTo(link) {
 
 document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("token");
+    const username = localStorage.getItem("username");
     if (!token) {
-        // скрыть кнопку logout, если пользователь не авторизован
-        swapPageTo('/forum');
         AccountButton[0].style.display = "none";
         const response = await fetch("/check_token", {
             method: "POST",
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             swapPageTo('/sign_in');
         }
     } else {
-        swapPageTo('/forum');
+        swapPageTo(`/forum/${username}`);
     }
 });
 

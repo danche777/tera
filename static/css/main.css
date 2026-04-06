@@ -154,8 +154,6 @@ header div {
     width: 180px;
     height: 120px;
     border-radius: 20px;
-    border: black solid 2px
-    background: #f3f3f3;
     display: flex;
     align-items: center;
     justify-content: center;

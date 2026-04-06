@@ -207,4 +207,3 @@ downvouteButton.forEach(button => {
         }
     };
 });
-

@@ -125,9 +125,9 @@ def to_create():
 def to_support():
     return FileResponse("pages/info.html")
 
-@app.get("/forum", tags=["lincs"], response_class=HTMLResponse)
-def to_forum(request: Request):
-    context = get_posts(request)
+@app.get("/forum/{username}", tags=["lincs"], response_class=HTMLResponse)
+def to_forum(request: Request, username):
+    context = get_posts(request, username)
     return templates.TemplateResponse("forum.html", context)
 
 @app.get("/comments/{post_id}", tags=["lincs"], response_class=HTMLResponse)
@@ -180,7 +180,7 @@ async def reg(data: Form):
     ).fetchall()
     con.commit()
     
-    (username, data.username)
+
     if username:
         raise HTTPException(status_code=400, detail="username already exists")
     cursor.execute(
@@ -198,11 +198,9 @@ def check_token(data: Token):
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     expires_at = payload["exp"]
     username = payload["sub"]
-    (expires_at, username)
-    (time.time() >= expires_at)
+
     if time.time() >= expires_at:
         raise HTTPException(detail="Token expired", status_code=404)
-    (data.access_token)
     return {"status": "ok"}, username
 
 # добавление поста
@@ -327,22 +325,28 @@ def delete_post(data: DeletePost):
     con.close()
 
 # получение всех постов с количеством лайков и дизлайков
-def get_posts(request):
+def get_posts(request, username):
     con, cursor = conectDB()
+    print(username)
     posts = cursor.execute(
         """
         SELECT
-            posts.id, 
+            posts.id,
             posts.content,
             posts.username,
-            COALESCE(SUM(reactions.like) - SUM(reactions.dislike), 0) as total
+            COALESCE(SUM(reactions.like) - SUM(reactions.dislike), 0) as total,
+            IF(reactions.username = ?,
+                IF(reactions.like == '1', 'like',
+                    IF (reactions.dislike == '1', 'dislike', 'null')
+            ), 'null') as personal_reaction
         FROM posts
         LEFT JOIN reactions
         ON posts.id = reactions.post_id
         GROUP BY posts.id
         ORDER BY total DESC
-        """
+        """,  (username,)
     ).fetchall()
+    print([i for i in posts ])
     context = {
         "request": request,
         "posts": []
@@ -355,9 +359,11 @@ def get_posts(request):
                 "content": posts[i][1],
                 "username": posts[i][2],
                 "total": posts[i][3],
+                "personal_reaction": posts[i][4],
             }
         )
-    print('total', posts[i][3])
+        print(posts[i][4])
+
     return context
 
 # получение всех постов конкретного пользователя с количеством лайков и дизлайков
@@ -406,14 +412,14 @@ def get_comments(request):
         ORDER BY id DESC
         """, (request.path_params["post_id"],)
     ).fetchall()
-    (request.path_params["post_id"])
+
     context = {
         "request": request,
         "comments": []
     }
 
     for i in range(len(coments)):
-        (coments[i])
+
         context["comments"].append(
             {
                 "id": coments[i][0],
