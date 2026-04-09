@@ -97,7 +97,6 @@ def conectDB():
             post_id INT,
             username VARCHAR(16),
             like DEFUELT NULL,
-            dislike DEFUELT NULL,
             FOREIGN KEY (post_id) REFERENCES posts(id)
         );
         '''
@@ -218,7 +217,9 @@ def add_post(data: Post):
     )
     cursor.execute(
         '''
-        INSERT INTO reactions (post_id, username) VALUES (?, ?)
+        INSERT INTO reactions (post_id, username) VALUES (
+        (SELECT id FROM posts where content = ?), ?
+        )
         ''',
         (data.content, username)
     )
@@ -252,14 +253,12 @@ def add_post(data: Reaction):
     
     username = payload["sub"]
     post_id = data.post_id
-    like = data.reaction[0]
-    dislike = data.reaction[1]
+    like = data.reaction
 
     reaction_state = cursor.execute(
         """
         SELECT
-            like,
-            dislike
+            like
         FROM reactions
         WHERE username = ? AND post_id = ?
         """,
@@ -267,18 +266,15 @@ def add_post(data: Reaction):
     ).fetchall()
 
     
-
-    print(f'username: {username} {reaction_state}')
-    # print(reaction_state[0][0], like, reaction_state[0][1], dislike)
-    print(reaction_state == [])
+    # print(type(reaction_state[0][0]), type(like))
     if reaction_state == []:
         cursor.execute(
             '''
-            INSERT INTO reactions (username, post_id, like, dislike) VALUES (?, ?, ?, ?)
+            INSERT INTO reactions (username, post_id, like) VALUES (?, ?, ?)
             ''',
-            (username, post_id, like, dislike,) 
+            (username, post_id, like) 
         )
-    elif reaction_state[0][0] == like and reaction_state[0][1] == dislike:
+    elif str(reaction_state[0][0]) == like:
         cursor.execute(
             '''
             DELETE FROM reactions WHERE username = ? AND post_id = ?
@@ -288,9 +284,9 @@ def add_post(data: Reaction):
     else:
         cursor.execute(
             '''
-            UPDATE reactions SET like = ?, dislike = ? WHERE username = ? AND post_id = ?
+            UPDATE reactions SET like = ? WHERE username = ? AND post_id = ?
             ''',
-            (like, dislike, username, post_id,)
+            (like, username, post_id,)
         )
 
     
@@ -334,19 +330,13 @@ def get_posts(request, username):
             posts.id,
             posts.content,
             posts.username,
-            COALESCE(SUM(reactions.like) - SUM(reactions.dislike), 0) as total,
-            IF(reactions.username = ?,
-                IF(reactions.like == '1', 'like',
-                    IF (reactions.dislike == '1', 'dislike', 'null')
-            ), 'null') as personal_reaction
+            (select sum(COALESCE(like, 0)) from reactions where posts.id = reactions.post_id) as total_likes,
+            (select like from reactions where posts.id = reactions.post_id and reactions.username = ? limit 1) as personal_likes
         FROM posts
-        LEFT JOIN reactions
-        ON posts.id = reactions.post_id
-        GROUP BY posts.id
-        ORDER BY total DESC
         """,  (username,)
     ).fetchall()
-    print([i for i in posts ])
+    for row in posts:
+        print(row)
     context = {
         "request": request,
         "posts": []
@@ -358,11 +348,11 @@ def get_posts(request, username):
                 "id": posts[i][0],
                 "content": posts[i][1],
                 "username": posts[i][2],
-                "total": posts[i][3],
+                "total_likes": posts[i][3],
                 "personal_reaction": posts[i][4],
+                
             }
         )
-        print(posts[i][4])
 
     return context
 
@@ -375,8 +365,7 @@ def get_personal_posts(request, username):
             posts.id,
             posts.content,
             posts.username,
-            SUM(reactions.like),
-            SUM(reactions.dislike)
+            SUM(reactions.like)
         FROM posts 
         LEFT JOIN reactions ON posts.id = reactions.post_id
         WHERE posts.username = ?
@@ -396,7 +385,6 @@ def get_personal_posts(request, username):
                 "content": posts[i][1],
                 "username": username,
                 "likes_count": posts[i][3],
-                "dislikes_count": posts[i][4]
             }
         )
     return context

@@ -133,22 +133,22 @@ commentButtons.forEach(button => {
             localStorage.setItem("postUsername", postUsername);
             localStorage.setItem("postId", postId);
             window.location.href = `/comments/${postId}`;
-        }
+        };
     };
 });
 
 
 async function like(postId) {
     const token = localStorage.getItem("token")
-    const like = 1
-    const dislike = 0
+    const like = "1"
+
     const response = await fetch("/add_reaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             post_id: postId,
             access_token: token,
-            reaction: [like, dislike]
+            reaction: like
         })
     });
 
@@ -161,15 +161,15 @@ async function like(postId) {
 
 async function dislike(postId) {
     const token = localStorage.getItem("token")
-    const like = 0
-    const dislike = 1
+    const like = "-1"
+
     const response = await fetch("/add_reaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             post_id: postId,
             access_token: token,
-            reaction: [like, dislike]
+            reaction: like
         })
     });
 
@@ -182,7 +182,7 @@ async function dislike(postId) {
 
 
 // лайк
-const upvouteButton = document.querySelectorAll("#upvoute");   
+const upvouteButton = document.querySelectorAll("#upvoute");
 upvouteButton.forEach(button => {
     button.onclick = function () {
         const postId = this.name; // ID кнопки совпадает с ID поста
@@ -190,13 +190,13 @@ upvouteButton.forEach(button => {
         const contentElement = postContainer.querySelector('.upvoute_button');
         // const usernameElement = postContainer.querySelector('.username');
         if (postId && contentElement) {
-            like(postId)
-        }
+            like(postId);
+        };
     };
 });
 
 // дизлайк
-const downvouteButton = document.querySelectorAll("#downvoute");   
+const downvouteButton = document.querySelectorAll("#downvoute");
 downvouteButton.forEach(button => {
     button.onclick = function () {
         const postId = this.name; // ID кнопки совпадает с ID поста
@@ -204,6 +204,6 @@ downvouteButton.forEach(button => {
         const contentElement = postContainer.querySelector('.upvoute_button');
         if (postId && contentElement) {
             dislike(postId)
-        }
+        };
     };
 });

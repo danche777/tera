@@ -19,7 +19,7 @@ class Coment(BaseModel):
 class Reaction(BaseModel):
     access_token: str
     post_id: str
-    reaction: list
+    reaction: str
 
 class DeletePost(BaseModel):
     access_token: str

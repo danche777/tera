@@ -20,22 +20,22 @@
             <div class="item_forum" id="{{ item['id'] }}">
                 <div class="content_item_forum">{{ item["content"] }}</div>
                 <div class="objects_item_forun">
-                    {% if item["personal_reaction"] == "like" %}
+                    {% if item["personal_reaction"] == 1 %}
                     <div style=" display: flex; flex-direction: row; gap: 20px; border-radius: 20px; background-color: rgb(235, 132, 132);">
                         <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
                             <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
                         </button>
-                        <div class="forum_reacts_count">{{ item["total"] }}</div>
+                        <div class="forum_reacts_count">{{ item["total_likes" ]}}</div>
                         <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
                             <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
                         </button>
                     </div>
-                    {% elif item["personal_reaction"] == "dislike" %}
+                    {% elif item["personal_reaction"] == -1 %}
                     <div style=" display: flex; flex-direction: row; gap: 20px; border-radius: 20px; background-color: rgb(146, 144, 255);">
                         <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
                             <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
                         </button>
-                        <div class="forum_reacts_count">{{ item["total"] }}</div>
+                        <div class="forum_reacts_count">{{ item["total_likes" ]}}</div>
                         <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
                             <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
                         </button>
@@ -45,7 +45,7 @@
                         <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
                             <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
                         </button>
-                        <div class="forum_reacts_count">{{ item["total"] }}</div>
+                        <div class="forum_reacts_count">{{ item["total_likes" ]}}</div>
                         <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
                             <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
                         </button>
