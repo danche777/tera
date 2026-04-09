@@ -84,7 +84,7 @@ def conectDB():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             content TEXT,
             username VARCHAR(16),
-            post_id DEFUELT NULL,
+            post_id DEFAULT NULL,
             FOREIGN KEY (post_id) REFERENCES posts(id)
         );
         '''
@@ -96,7 +96,7 @@ def conectDB():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             post_id INT,
             username VARCHAR(16),
-            like DEFUELT NULL,
+            like integer DEFAULT 0,
             FOREIGN KEY (post_id) REFERENCES posts(id)
         );
         '''
@@ -105,7 +105,17 @@ def conectDB():
     return con, cursor
 
 
+def check_token(accses_token: str, username: str):
+    payload = decode(accses_token, SECRET_KEY, algorithms=[ALGORITHM])
+    expires_at = payload["exp"]
+    token_username = payload["sub"]
 
+    if username != token_username:
+        raise HTTPException(detail="Can`t access", status_code=403)
+
+    if time.time() >= expires_at:
+        raise HTTPException(detail="Token expired", status_code=404)
+        
 
 # ссылки на все страницы
 @app.get("/", tags=["lincs"])
@@ -134,8 +144,9 @@ def to_comments(request: Request):
     context = get_comments(request)
     return templates.TemplateResponse("comments.html", context)
 
-@app.get("/account/{username}", tags=["lincs"], response_class=HTMLResponse)
-def to_account(request: Request, username: str):
+@app.get("/account/{username}/{access_token}", tags=["lincs"], response_class=HTMLResponse)
+def to_account(request: Request, username: str, access_token: str):
+    check_token(access_token, username)
     context = get_personal_posts(request, username)
     return templates.TemplateResponse("account.html", context)
 
@@ -193,7 +204,7 @@ async def reg(data: Form):
 
 # проверка токена на валидность и срок годности
 @app.post("/check_token")
-def check_token(data: Token):
+def check_token_view(data: Token):
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     expires_at = payload["exp"]
     username = payload["sub"]
@@ -266,7 +277,6 @@ def add_post(data: Reaction):
     ).fetchall()
 
     
-    # print(type(reaction_state[0][0]), type(like))
     if reaction_state == []:
         cursor.execute(
             '''
@@ -277,9 +287,9 @@ def add_post(data: Reaction):
     elif str(reaction_state[0][0]) == like:
         cursor.execute(
             '''
-            DELETE FROM reactions WHERE username = ? AND post_id = ?
+            UPDATE reactions SET like = ? WHERE username = ? AND post_id = ?
             ''',
-        (username, post_id,)
+            (0, username, post_id,)
         )
     else:
         cursor.execute(
@@ -418,6 +428,8 @@ def get_comments(request):
         )
 
     return context
+
+
 
 
 # запуск веб приложения

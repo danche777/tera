@@ -27,22 +27,11 @@ async function deletePost(postId) {
     };
 };
 
-async function getUser() {
-    const token = localStorage.getItem("token")
-    const response = await fetch("/get_user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            access_token: token
-        })
-    });
-}
-
 function logout() {
     const token = localStorage.getItem("token");
     if (token) {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
-        location.href = "/";
+        window.location.href = "/";
     }
 }

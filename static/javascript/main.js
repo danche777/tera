@@ -97,5 +97,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 function account() {
     const username = localStorage.getItem("username");
-    location.href = `/account/${username}`
+    const token = localStorage.getItem("token");
+    location.href = `/account/${username}/${token}`
 };
