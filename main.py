@@ -105,8 +105,12 @@ def conectDB():
     return con, cursor
 
 
-def check_token(accses_token: str, username: str):
-    payload = decode(accses_token, SECRET_KEY, algorithms=[ALGORITHM])
+def check_token(access_token: str, username: str):
+    payload = None
+    try:
+        payload = decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    except Exception as ex:
+        raise HTTPException(detail=str(ex), status_code=403)
     expires_at = payload["exp"]
     token_username = payload["sub"]
 
@@ -134,8 +138,12 @@ def to_create():
 def to_support():
     return FileResponse("pages/info.html")
 
-@app.get("/forum/{username}", tags=["lincs"], response_class=HTMLResponse)
-def to_forum(request: Request, username):
+@app.get("/forum/{username}/{access_token}", tags=["lincs"], response_class=HTMLResponse)
+def to_forum(request: Request, username: str, access_token: str):
+    try:
+        check_token(access_token, username)
+    except Exception:
+        return FileResponse("pages/sign_in.html")
     context = get_posts(request, username)
     return templates.TemplateResponse("forum.html", context)
 
@@ -205,13 +213,17 @@ async def reg(data: Form):
 # проверка токена на валидность и срок годности
 @app.post("/check_token")
 def check_token_view(data: Token):
-    payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    payload = None
+    try:
+        payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    except Exception as ex:
+        raise HTTPException(detail=str(ex), status_code=403)
     expires_at = payload["exp"]
     username = payload["sub"]
 
     if time.time() >= expires_at:
         raise HTTPException(detail="Token expired", status_code=404)
-    return {"status": "ok"}, username
+    return {"status": "ok"}
 
 # добавление поста
 @app.post("/add_post")

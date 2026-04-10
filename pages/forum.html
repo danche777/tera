@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Forum - TErA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../static/css/main.css">
+<link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
     <header>
@@ -23,31 +23,31 @@
                     {% if item["personal_reaction"] == 1 %}
                     <div style=" display: flex; flex-direction: row; gap: 20px; border-radius: 20px; background-color: rgb(235, 132, 132);">
                         <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
-                            <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
+                            <img src="/static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
                         </button>
                         <div class="forum_reacts_count">{{ item["total_likes" ]}}</div>
                         <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
-                            <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
+                            <img src="/static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
                         </button>
                     </div>
                     {% elif item["personal_reaction"] == -1 %}
                     <div style=" display: flex; flex-direction: row; gap: 20px; border-radius: 20px; background-color: rgb(146, 144, 255);">
                         <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
-                            <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
+                            <img src="/static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
                         </button>
                         <div class="forum_reacts_count">{{ item["total_likes" ]}}</div>
                         <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
-                            <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
+                            <img src="/static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
                         </button>
                     </div>
                     {% else %}
                     <div style=" display: flex; flex-direction: row; gap: 20px; border-radius: 20px;">
                         <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
-                            <img src="../static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
+                            <img src="/static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
                         </button>
                         <div class="forum_reacts_count">{{ item["total_likes" ]}}</div>
                         <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
-                            <img src="../static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
+                            <img src="/static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
                         </button>
                     </div>
                     {% endif %}
@@ -59,7 +59,7 @@
             </div>
             {% endfor %}
     </div>
-<script src="../static/javascript/forum.js"></script>
-<script src="../static/javascript/check_token.js"></script>
+<script src="/static/javascript/forum.js"></script>
+<script src="/static/javascript/check_token.js"></script>
 </body>
 </html>

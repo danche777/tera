@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (!response.ok) {
             localStorage.removeItem("token");
+            localStorage.removeItem("username")
             this.location.href= '/sign_in'
         };
     };
