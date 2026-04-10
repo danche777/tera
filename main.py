@@ -138,13 +138,21 @@ def to_create():
 def to_support():
     return FileResponse("pages/info.html")
 
+from fastapi import Query
+
 @app.get("/forum/{username}/{access_token}", tags=["lincs"], response_class=HTMLResponse)
-def to_forum(request: Request, username: str, access_token: str):
+def to_forum(
+    request: Request,
+    username: str,
+    access_token: str,
+    page_number: int
+    ):
+    print(page_number)
     try:
         check_token(access_token, username)
     except Exception:
         return FileResponse("pages/sign_in.html")
-    context = get_posts(request, username)
+    context = get_posts(request, username, page_number)
     return templates.TemplateResponse("forum.html", context)
 
 @app.get("/comments/{post_id}", tags=["lincs"], response_class=HTMLResponse)
@@ -201,6 +209,10 @@ async def reg(data: Form):
 
     if username:
         raise HTTPException(status_code=400, detail="username already exists")
+    elif " " in data.username:
+        raise HTTPException(status_code=400, detail="username spaces!")
+    elif " " in data.password:
+        raise HTTPException(status_code=400, detail="password spaces!")
     cursor.execute(
         '''
         INSERT INTO users (username, password) VALUES (?, ?)
@@ -232,21 +244,22 @@ def add_post(data: Post):
 
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     username = payload["sub"]
-    cursor.execute(
-        '''
-        INSERT INTO posts (content, username) VALUES (?, ?)
-        ''',
-        (data.content, username)
-    )
-    cursor.execute(
-        '''
-        INSERT INTO reactions (post_id, username) VALUES (
-        (SELECT id FROM posts where content = ?), ?
+    for i in range(2000):
+        cursor.execute(
+            '''
+            INSERT INTO posts (content, username) VALUES (?, ?)
+            ''',
+            (data.content, username)
         )
-        ''',
-        (data.content, username)
-    )
-    
+        cursor.execute(
+            '''
+            INSERT INTO reactions (post_id, username) VALUES (
+            (SELECT id FROM posts where content = ?), ?
+            )
+            ''',
+            (data.content, username)
+        )
+        
     con.commit()
     con.close()
 
@@ -343,9 +356,8 @@ def delete_post(data: DeletePost):
     con.close()
 
 # получение всех постов с количеством лайков и дизлайков
-def get_posts(request, username):
+def get_posts(request, username, page_number):
     con, cursor = conectDB()
-    print(username)
     posts = cursor.execute(
         """
         SELECT
@@ -355,10 +367,10 @@ def get_posts(request, username):
             (select sum(COALESCE(like, 0)) from reactions where posts.id = reactions.post_id) as total_likes,
             (select like from reactions where posts.id = reactions.post_id and reactions.username = ? limit 1) as personal_likes
         FROM posts
-        """,  (username,)
+        LIMIT ? OFFSET ?
+        """,  (username, 10, page_number * 10)
     ).fetchall()
-    for row in posts:
-        print(row)
+
     context = {
         "request": request,
         "posts": []

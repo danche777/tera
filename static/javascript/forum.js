@@ -34,6 +34,7 @@ function showCreatePostModal() {
     textarea.id = 'post-text';
     textarea.placeholder = 'Введите текст вашего поста...';
     textarea.rows = 5;
+    textarea.maxLength = 500
     
     submitBtn.className = 'submit-post-btn';
     submitBtn.textContent = 'Опубликовать';
@@ -207,3 +208,29 @@ downvouteButton.forEach(button => {
         };
     };
 });
+
+
+async function left_facing() {
+    const response = await fetch("/add_reaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            moution: 'left'
+        })
+    });
+
+    if (!response.ok) {
+        alert('error')
+    } else (
+        location.reload()
+    )
+}
+
+function page_moving(direction) {
+    const urlParams = new URL(window.location.href)
+
+    var page_number = Number(urlParams.searchParams.get('page_number')) + direction
+
+    urlParams.searchParams.set('page_number', page_number);
+    window.location.href = urlParams.toString()
+}

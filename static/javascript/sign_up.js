@@ -66,14 +66,8 @@ button.addEventListener('click', () => {
         // проверки
     if (!username.value || !password.value) {
         DisplayErrorTooltip('Enter text');
-    } else if (username.value.length <= 1) {
-        DisplayErrorTooltip('name <= 1');
-    } else if (username.value.length >= 16) {
-        DisplayErrorTooltip('username >= 16');
     } else if (password.value.length < 8) {
         DisplayErrorTooltip('password < 8');
-    } else if (password.value.length >= 16) {
-        DisplayErrorTooltip('password >= 16');
         // отправка если проверки были пройдены
     } else {
         signUp()

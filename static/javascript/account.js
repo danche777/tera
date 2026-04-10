@@ -35,3 +35,21 @@ function logout() {
         window.location.href = "/";
     }
 }
+
+const commentButtons = document.querySelectorAll(".comments_button");
+commentButtons.forEach(button => {
+    button.onclick = function () {
+        const Id = this.id; // ID кнопки совпадает с ID поста
+        const postContainer = this.closest('.item_forum');
+        const contentElement = postContainer.querySelector('.content_item_forum');
+        if (Id && contentElement) {
+            const postId = this.id;
+            const postContent = contentElement.textContent;
+            const postUsername = localStorage.getItem("username");
+            localStorage.setItem("postContent", postContent);
+            localStorage.setItem("postUsername", postUsername);
+            localStorage.setItem("postId", postId);
+            window.location.href = `/comments/${postId}`;
+        };
+    };
+});
