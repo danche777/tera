@@ -209,38 +209,26 @@ downvouteButton.forEach(button => {
     };
 });
 
+const leftBtn = document.querySelector(".left_facing_button");
+const rightBtn = document.querySelector(".right_facing_button");
+const current_number_page = document.querySelector(".current_number_page");
 
-async function left_facing() {
-    const response = await fetch("/add_reaction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            moution: 'left'
-        })
-    });
-
-    if (!response.ok) {
-        alert('error')
-    } else (
-        location.reload()
-    )
+const urlParams = new URL(window.location.href);
+const currentPage = Number(urlParams.searchParams.get('page_number')) + 1;
+if (currentPage === 1 && currentPage === count_pages) {
+    alert(1)
+    leftBtn.style.display = 'none';
+} else if (currentPage === count_pages) {
+    alert(2)
+    rightBtn.style.display = 'none';
+} else {
+    alert(3)
+    leftBtn.style.display = 'block';
 }
 
-    const leftBtn = document.querySelector(".left_facing_button");
-    const rightBtn = document.querySelector(".right_facing_button");
-    const current_number_page = document.querySelector(".current_number_page");
-
-    const urlParams = new URL(window.location.href);
-    const currentPage = Number(urlParams.searchParams.get('page_number')) + 1;
-
-    if (currentPage === 1) {
-        leftBtn.style.display = 'none';
-    } else {
-        leftBtn.style.display = 'block';
-    }
-    leftBtn.textContent = currentPage - 1
-    rightBtn.textContent = currentPage + 1
-    current_number_page.textContent = currentPage
+leftBtn.textContent = currentPage - 1
+rightBtn.textContent = currentPage + 1
+current_number_page.textContent = currentPage
 
 function page_moving(direction) {
     const urlParams = new URL(window.location.href)

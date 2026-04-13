@@ -24,3 +24,6 @@ class Reaction(BaseModel):
 class DeletePost(BaseModel):
     access_token: str
     post_id: str
+
+class Count_pages(BaseModel):
+    count_pages: int

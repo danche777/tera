@@ -1,8 +1,8 @@
-# time и jwt для создания токена
+# time, jwt, passlib для создания токена и хеширования пароля
 import time
 from datetime import timedelta
 from jwt import encode, decode
-
+from passlib.context import CryptContext
 
 # FastAPI
 from fastapi import FastAPI, Request
@@ -17,12 +17,15 @@ import sqlite3
 
 
 # pydentic схемы
-from schemes import Form, Token, Post, Coment, Reaction, DeletePost
+from schemes import Form, Token, Post, Coment, Reaction, DeletePost, Count_pages
 
 
 
-# константы для создания токена на 30 минут
+# константы для создания токена на 30 минут и хеширования пароля
 TOKEN_MINUTES, SECRET_KEY, ALGORITHM  = 30, "secret-key", "HS256"
+
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
+
 
 # создание токена
 def create_access_token(subject: str, expires_delta=None) -> str:
@@ -30,6 +33,13 @@ def create_access_token(subject: str, expires_delta=None) -> str:
     to_encode = {"sub": subject, "exp": expire}
     return encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+# создания хешированного пароля
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+# верефекация пароля
+def verify_password(password: str, hashed: str) -> bool:
+    return pwd_context.verify(password, hashed)
 
 
 # подключение к FastAPI
@@ -96,7 +106,7 @@ def conectDB():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             post_id INT,
             username VARCHAR(16),
-            like integer DEFAULT 0,
+            like INT DEFAULT 0,
             FOREIGN KEY (post_id) REFERENCES posts(id)
         );
         '''
@@ -147,7 +157,7 @@ def to_forum(
     access_token: str,
     page_number: int
     ):
-    print(page_number)
+    
     try:
         check_token(access_token, username)
     except Exception:
@@ -178,13 +188,12 @@ async def auth(data: Form):
         (data.username,)
     ).fetchall()
 
-    (cursor.execute("select username, password from users").fetchall())
-
     if not user:
         raise HTTPException(status_code=400, detail="username not found")
 
     password = user[0][1]
-    if data.password != password:
+    
+    if verify_password(data.password, password) == False:
         raise HTTPException(status_code=400, detail="Incorrect password")
     else:
         token = create_access_token(data.username)
@@ -213,12 +222,14 @@ async def reg(data: Form):
         raise HTTPException(status_code=400, detail="username spaces!")
     elif " " in data.password:
         raise HTTPException(status_code=400, detail="password spaces!")
+
     cursor.execute(
         '''
         INSERT INTO users (username, password) VALUES (?, ?)
         ''',
-        (data.username, data.password)
+        (data.username, hash_password(data.password))
     )
+
     con.commit()
     con.close()
 
@@ -244,21 +255,21 @@ def add_post(data: Post):
 
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     username = payload["sub"]
-    for i in range(2000):
-        cursor.execute(
-            '''
-            INSERT INTO posts (content, username) VALUES (?, ?)
-            ''',
-            (data.content, username)
+    
+    cursor.execute(
+        '''
+        INSERT INTO posts (content, username) VALUES (?, ?)
+        ''',
+        (data.content, username)
+    )
+    cursor.execute(
+        '''
+        INSERT INTO reactions (post_id, username) VALUES (
+        (SELECT id FROM posts where content = ?), ?
         )
-        cursor.execute(
-            '''
-            INSERT INTO reactions (post_id, username) VALUES (
-            (SELECT id FROM posts where content = ?), ?
-            )
-            ''',
-            (data.content, username)
-        )
+        ''',
+        (data.content, username)
+    )
         
     con.commit()
     con.close()
@@ -270,29 +281,13 @@ def add_comment(data: Coment):
 
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     username = payload["sub"]
-    for i in range(4000):
-        for ii in range(2000):
-            cursor.execute(
-                '''
-                INSERT INTO comments (content, username, post_id) VALUES (?, ?, ?)
-                ''',
-                (str(ii * 30), f"{ii}username", i)
-            )
 
-
-
-
-
-
-
-
-
-            # cursor.execute(
-            #     '''
-            #     INSERT INTO comments (content, username, post_id) VALUES (?, ?, ?)
-            #     ''',
-            #     (data.comment, username, data.post_id)
-            # )
+    cursor.execute(
+        '''
+        INSERT INTO comments (content, username, post_id) VALUES (?, ?, ?)
+        ''',
+        (data.comment, username, data.post_id)
+    )
     
     con.commit()
     con.close()
@@ -372,6 +367,21 @@ def delete_post(data: DeletePost):
     con.commit()
     con.close()
 
+@app.get("/get_count_pages")
+def get_count_pages():
+    con, cursor = conectDB()
+    count_posts = cursor.execute(
+        """
+        SELECT
+            count(posts.id )
+        FROM posts
+        """
+    ).fetchall()[0][0]
+    count_posts //= 10
+
+    count_pages = Count_pages(count_pages=count_posts)
+    return count_pages
+
 # получение всех постов с количеством лайков и дизлайков
 def get_posts(request, username, page_number):
     con, cursor = conectDB()
@@ -381,13 +391,24 @@ def get_posts(request, username, page_number):
             posts.id,
             posts.content,
             posts.username,
-            (select sum(COALESCE(like, 0)) from reactions where posts.id = reactions.post_id) as total_likes,
-            (select like from reactions where posts.id = reactions.post_id and reactions.username = ? limit 1) as personal_likes
+            COALESCE(
+            	(
+	            	select sum(COALESCE(like, 0)) 
+	            	from reactions where posts.id = reactions.post_id
+            	), 0
+            ) as total_likes,
+            COALESCE(
+            	(
+	            	select like from reactions
+	            	where posts.id = reactions.post_id 
+	            	and reactions.username = ? limit 1
+            	), 0
+            ) as personal_likes
         FROM posts
         LIMIT ? OFFSET ?
         """,  (username, 10, page_number * 10)
     ).fetchall()
-
+    
     context = {
         "request": request,
         "posts": []
@@ -401,7 +422,6 @@ def get_posts(request, username, page_number):
                 "username": posts[i][2],
                 "total_likes": posts[i][3],
                 "personal_reaction": posts[i][4],
-                
             }
         )
 

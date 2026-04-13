@@ -30,7 +30,7 @@
                         <button class="upvoute_button" id="upvoute" name="{{ item['id'] }}">
                             <img src="/static/svg/arrow-up-svgrepo-com.svg" alt="arrow-up" style="width: 100%;">
                         </button>
-                        <div class="forum_reacts_count">{{ item["total_likes" ]}}</div>
+                        <div class="forum_reacts_count">{{ item["total_likes"] }}</div>
                         <button  class="downvoute_button" id="downvoute" name="{{ item['id'] }}">
                             <img src="/static/svg/arrow-down-svgrepo-com.svg" alt="arrow-down" style="width: 100%;">
                         </button>
@@ -42,11 +42,11 @@
                 </div>
             </div>
             {% endfor %}
-            <div class="facing_button_container">
-                <button class="left_facing_button" onclick="page_moving(-1)"></button>
-                <div class="current_number_page"></div>
-                <button class="right_facing_button" onclick="page_moving(1)"></button>
-            </div>
+        <div class="facing_button_container">
+            <button class="left_facing_button" onclick="page_moving(-1)"></button>
+            <div class="current_number_page"></div>
+            <button class="right_facing_button" onclick="page_moving(1)"></button>
+        </div>
     </div>
 <script src="/static/javascript/forum.js"></script>
 <script src="/static/javascript/check_token.js"></script>
