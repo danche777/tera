@@ -15,7 +15,7 @@ function showCreatePostModal() {
     const modalBody = document.createElement('div');
     const textarea = document.createElement('textarea');
     const submitBtn = document.createElement('button');
-
+    console.log(submitBtn);
     // 2. Добавляем классы и атрибуты
     modalOverlay.id = 'post-modal';
     modalOverlay.className = 'modal-overlay';
@@ -225,6 +225,22 @@ async function left_facing() {
         location.reload()
     )
 }
+
+    const leftBtn = document.querySelector(".left_facing_button");
+    const rightBtn = document.querySelector(".right_facing_button");
+    const current_number_page = document.querySelector(".current_number_page");
+
+    const urlParams = new URL(window.location.href);
+    const currentPage = Number(urlParams.searchParams.get('page_number')) + 1;
+
+    if (currentPage === 1) {
+        leftBtn.style.display = 'none';
+    } else {
+        leftBtn.style.display = 'block';
+    }
+    leftBtn.textContent = currentPage - 1
+    rightBtn.textContent = currentPage + 1
+    current_number_page.textContent = currentPage
 
 function page_moving(direction) {
     const urlParams = new URL(window.location.href)

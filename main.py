@@ -265,24 +265,41 @@ def add_post(data: Post):
 
 # добавление комментария
 @app.post("/add_comment")
-def add_post(data: Coment):
+def add_comment(data: Coment):
     con, cursor = conectDB()
 
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     username = payload["sub"]
-    cursor.execute(
-        '''
-        INSERT INTO comments (content, username, post_id) VALUES (?, ?, ?)
-        ''',
-        (data.comment, username, data.post_id)
-    )
+    for i in range(4000):
+        for ii in range(2000):
+            cursor.execute(
+                '''
+                INSERT INTO comments (content, username, post_id) VALUES (?, ?, ?)
+                ''',
+                (str(ii * 30), f"{ii}username", i)
+            )
+
+
+
+
+
+
+
+
+
+            # cursor.execute(
+            #     '''
+            #     INSERT INTO comments (content, username, post_id) VALUES (?, ?, ?)
+            #     ''',
+            #     (data.comment, username, data.post_id)
+            # )
     
     con.commit()
     con.close()
 
 # реакция на пост (лайк или дизлайк)
 @app.post("/add_reaction")
-def add_post(data: Reaction):
+def add_reaction(data: Reaction):
     con, cursor = conectDB()
 
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])

@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             swapPageTo('/sign_in');
         }
     } else {
-        swapPageTo(`/forum/${username}/${token}`);
+        swapPageTo(`/forum/${username}/${token}?page_number=${0}`);
     }
 });
 

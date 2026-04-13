@@ -6,6 +6,9 @@ __pycache__/
 # tests
 tests.py
 
+# data base
+data.db
+
 # C extensions
 *.so
 
