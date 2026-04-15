@@ -687,6 +687,15 @@ button:active {
     margin-bottom: 5px;
 }
 
+.date_time {
+    display: flex;
+    gap: 10px;
+}
+
+.date_time span {
+    color: rgba(0, 0, 0, 0.74);
+}
+
 .comment_content {
     width: 100%;
     text-wrap: wrap;

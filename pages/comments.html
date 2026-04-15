@@ -26,12 +26,17 @@
             </div>
             
             {% for item in comments %}
-            <div class="comment_item">
+            <div class="comment_item" id="{{ item['id'] }}">
                 <div class="comment_info">
-                    <div class="comment_username">{{ item["username"] }}</div>
+                    <span class="comment_username">{{ item["username"] }}</span>
+                    <div class="date_time">
+                        <span">{{ item["time"] }}</span>
+                        <span>{{ item["date"] }}</span>
+                    </div>
                 </div>
                 <div class="comment_content">{{ item["content"] }}</div>
-            </div><br>
+                <button style="background-color: transparent; border: none; position: relative;" onclick="addReplyComment()">reply</button>
+            </div>
             {% endfor %}
         </div>
     </div>

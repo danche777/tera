@@ -5,6 +5,7 @@ __pycache__/
 
 # tests
 tests.py
+tests.html
 
 # data base
 data.db

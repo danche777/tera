@@ -94,6 +94,8 @@ def conectDB():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             content TEXT,
             username VARCHAR(16),
+            time TIME,
+            date DATE,
             post_id DEFAULT NULL,
             FOREIGN KEY (post_id) REFERENCES posts(id)
         );
@@ -278,15 +280,18 @@ def add_post(data: Post):
 @app.post("/add_comment")
 def add_comment(data: Coment):
     con, cursor = conectDB()
+    now = time.localtime()
 
+    formatted_time = time.strftime("%H:%M", now)
+    formatted_date = time.strftime("%Y.%m.%d", now)
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     username = payload["sub"]
 
     cursor.execute(
         '''
-        INSERT INTO comments (content, username, post_id) VALUES (?, ?, ?)
+        INSERT INTO comments (content, username, post_id, time, date) VALUES (?, ?, ?, ?, ?)
         ''',
-        (data.comment, username, data.post_id)
+        (data.comment, username, data.post_id, formatted_time, formatted_date)
     )
     
     con.commit()
@@ -367,20 +372,20 @@ def delete_post(data: DeletePost):
     con.commit()
     con.close()
 
-@app.get("/get_count_pages")
-def get_count_pages():
-    con, cursor = conectDB()
-    count_posts = cursor.execute(
-        """
-        SELECT
-            count(posts.id )
-        FROM posts
-        """
-    ).fetchall()[0][0]
-    count_posts //= 10
+# @app.get("/get_count_pages")
+# def get_count_pages():
+#     con, cursor = conectDB()
+#     count_posts = cursor.execute(
+#         """
+#         SELECT
+#             count(posts.id )
+#         FROM posts
+#         """
+#     ).fetchall()[0][0]
+#     count_posts //= 10
 
-    count_pages = Count_pages(count_pages=count_posts)
-    return count_pages
+#     count_pages = Count_pages(count_pages=count_posts)
+#     return count_pages
 
 # получение всех постов с количеством лайков и дизлайков
 def get_posts(request, username, page_number):
@@ -484,7 +489,9 @@ def get_comments(request):
                 "id": coments[i][0],
                 "content": coments[i][1],
                 "username": coments[i][2],
-                "post_id": coments[i][3]
+                "time": coments[i][3],
+                "date": coments[i][4],
+                "post_id": coments[i][5]
             }
         )
 
