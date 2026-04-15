@@ -17,14 +17,14 @@
         </div>
     </header>
     <div class="account_body">
-            <h1>Account</h1>
+            <h1 style="margin: 0 10% 0 10%;">Account</h1>
 
                 <div class="account_info">
                     <img src="/static/image/profile.png" class="account_profile_image">
                     <span id="account_username" style="font-size: 20px; font-weight: bold; text-align: center;">{{ username }}</span>
                 </div>
                 <div class="account_users_posts">
-                    <h2>Posts</h2>
+                    <h2 style="margin: 0 10% 0 10%;">Yours Posts:</h2>
                     <div class="account_posts">
                         {% for item in posts %}
                         <div class="item_forum" id="{{ item['id'] }}">
