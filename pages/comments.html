@@ -16,12 +16,12 @@
             <button onclick="window.history.back()" class="close-modal" style="background: transparent; border: none; padding: 5px 0 5px 15px; font-size: 25px;">×</button>
             <div class="content_item_forum"></div>
             <div class="objects_item_forun">
-                <div style=" display: flex; flex-direction: row; gap: 40px">
+                <div style="display: flex; flex-direction: row; gap: 40px">
                     <div class="username"></div>
                 </div>
             </div>
             <div style="display: flex; flex-direction: column;">
-                <textarea type="text" id="comment_content" class="comment_input" placeholder="Write a comment..." value="asdasdasdasdasdasdasdasdasdasd" maxlength="200"></textarea>
+                <textarea type="text" id="comment_content" class="comment_input" placeholder="Write a comment..." maxlength="200"></textarea>
                 <button class="submit_comment_button">Submit</button>
             </div>
             {% for item in comments %}
@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div class="comment_content">{{ item["content"] }}</div>
-                <button style="background-color: transparent; border: none; position: relative;" id="reply" name="{{ item['id'] }}">reply</button>
+                <button class="reply_btn" id="reply" name="{{ item['id'] }}">reply</button>
             </div>
             {% endfor %}
         </div>

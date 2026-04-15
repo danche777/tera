@@ -680,6 +680,7 @@ button:active {
     padding: 10px;
     font-size: 18px;
     font-family: 'SpaceGrotesk';
+    transition: 1s;
 }
 
 .comment_username {
@@ -700,6 +701,92 @@ button:active {
     width: 100%;
     text-wrap: wrap;
     word-wrap: break-word;
+}
+
+.reply_btn {
+    background-color: transparent; 
+    border: none; 
+    position: relative;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.reply_btn:hover {
+    scale: 1.2;
+}
+
+/* ==================== REPLY UI ==================== */
+
+@keyframes a {
+    from { transform: scale3d(1, 0, 1);}
+    to { transform: scale3d(1, 1, 1);}
+}
+
+.reply_separator {
+    background-color: #00000033;
+    height: 2px;
+    margin-bottom: 5px;
+    animation: a 0.4s forwards;
+}
+
+.reply_body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #0000000c;
+    border: rgba(0, 0, 0, 0.322) dotted 3px;
+    border-radius: 20px;
+    padding: 1px;
+    filter: blur(100%);
+    animation: a 0.3s forwards;
+}
+
+.reply_textarea {
+    resize: none;
+    border: none;
+    border-radius: 20px;
+    width: 100%;
+    height: 20vh;
+    padding: 7px;
+    box-shadow: inset 0 0 20px 0 rgba(0, 0, 0, 0.404);
+    transition: 0.4s;
+    font-size: 20px;
+    
+}
+
+.reply_textarea:focus {
+    outline: none;
+    box-shadow: inset 0 0 20px 0 rgba(0, 0, 0, 0.404),
+                0 0 20px 0 rgba(0, 0, 0, 0.404);
+}
+
+.reply_buttons_container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.reply_submit_button {
+    width: 10vw;
+    border: none;
+    border-radius: 15px;
+    transition: 0.4s;
+}
+
+.reply_close_button {
+    background-color: transparent;
+    color: #0000007a;
+    border: none;
+    font-size: 25px;
+    padding-right: 7px;
+}
+
+.reply_close_button:hover {
+    color: #000;
+}
+
+.reply_submit_button:hover {
+    background-color: #0000007a;
+    color: white;
 }
 
 /* ==================== ACCOUNT ==================== */

@@ -373,21 +373,6 @@ def delete_post(data: DeletePost):
     con.commit()
     con.close()
 
-# @app.get("/get_count_pages")
-# def get_count_pages():
-#     con, cursor = conectDB()
-#     count_posts = cursor.execute(
-#         """
-#         SELECT
-#             count(posts.id )
-#         FROM posts
-#         """
-#     ).fetchall()[0][0]
-#     count_posts //= 10
-
-#     count_pages = Count_pages(count_pages=count_posts)
-#     return count_pages
-
 # получение всех постов с количеством лайков и дизлайков
 def get_posts(request, username, page_number):
     con, cursor = conectDB()

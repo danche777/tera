@@ -215,14 +215,9 @@ const current_number_page = document.querySelector(".current_number_page");
 
 const urlParams = new URL(window.location.href);
 const currentPage = Number(urlParams.searchParams.get('page_number')) + 1;
-if (currentPage === 1 && currentPage === count_pages) {
-    alert(1)
+if (currentPage === 1) {
     leftBtn.style.display = 'none';
-} else if (currentPage === count_pages) {
-    alert(2)
-    rightBtn.style.display = 'none';
 } else {
-    alert(3)
     leftBtn.style.display = 'block';
 }
 
