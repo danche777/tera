@@ -24,7 +24,6 @@
                 <textarea type="text" id="comment_content" class="comment_input" placeholder="Write a comment..." value="asdasdasdasdasdasdasdasdasdasd" maxlength="200"></textarea>
                 <button class="submit_comment_button">Submit</button>
             </div>
-            
             {% for item in comments %}
             <div class="comment_item" id="{{ item['id'] }}">
                 <div class="comment_info">
@@ -35,7 +34,7 @@
                     </div>
                 </div>
                 <div class="comment_content">{{ item["content"] }}</div>
-                <button style="background-color: transparent; border: none; position: relative;" onclick="addReplyComment()">reply</button>
+                <button style="background-color: transparent; border: none; position: relative;" id="reply" name="{{ item['id'] }}">reply</button>
             </div>
             {% endfor %}
         </div>

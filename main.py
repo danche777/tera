@@ -97,6 +97,7 @@ def conectDB():
             time TIME,
             date DATE,
             post_id DEFAULT NULL,
+            comment_id INT,
             FOREIGN KEY (post_id) REFERENCES posts(id)
         );
         '''
@@ -281,7 +282,7 @@ def add_post(data: Post):
 def add_comment(data: Coment):
     con, cursor = conectDB()
     now = time.localtime()
-
+    
     formatted_time = time.strftime("%H:%M", now)
     formatted_date = time.strftime("%Y.%m.%d", now)
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])

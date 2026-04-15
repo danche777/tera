@@ -14,6 +14,7 @@ class Post(BaseModel):
 class Coment(BaseModel):
     access_token: str
     post_id: str
+    comment_id: str
     comment: str
 
 class Reaction(BaseModel):

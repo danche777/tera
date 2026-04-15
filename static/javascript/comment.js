@@ -49,7 +49,7 @@ async function addReplyComment() {
     const token = localStorage.getItem("token")
     const postId = localStorage.getItem("postId")
     const contentComment = document.getElementById("comment_content").value
-    const commentId = document.getElementsByClassName("comment_item").id
+    const commentId = this.getElementsByClassName("comment_item").id
     const response = await fetch("/add_comment", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -69,3 +69,18 @@ async function addReplyComment() {
         alert('error')
     }
 }
+
+
+// лайк
+const replyButtton = document.querySelectorAll("#reply");
+replyButtton.forEach(button => {
+    button.onclick = function () {
+        const postId = this.name; // ID кнопки совпадает с ID поста
+        const postContainer = this.closest('.item_forum');
+        const contentElement = postContainer.querySelector('.upvoute_button');
+        // const usernameElement = postContainer.querySelector('.username');
+        if (postId && contentElement) {
+            like(postId);
+        };
+    };
+});
