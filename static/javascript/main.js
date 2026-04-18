@@ -100,3 +100,22 @@ function account() {
     const token = localStorage.getItem("token");
     location.href = `/account/${username}/${token}`
 };
+
+
+function getCookie(name) {
+    return document.cookie
+        .split("; ")
+        .find(row => row.startsWith(name + "="))
+        ?.split("=")[1];
+}
+
+const token = getCookie("access_token");
+const username = getCookie("username")?.replace(/^"|"$/g, ""); // Удаление кавычек с начала и конца строки
+
+if (token) {
+    console.log("TOKEN:", token);
+    console.log("USERNAME:", username);
+    localStorage.setItem("token", token);
+    localStorage.setItem("username", username);
+    document.cookie = "access_token=; Max-Age=0; path=/"; // Удаление куки после получения токена
+}

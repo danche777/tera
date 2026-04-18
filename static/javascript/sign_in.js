@@ -79,3 +79,7 @@ button.addEventListener('click', () => {
         auth()
     }
 });
+
+async function google_auth() {
+    window.location.href = "/login/google"
+}

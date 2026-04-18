@@ -10,7 +10,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from fastapi.exceptions import HTTPException
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 
+from authlib.integrations.starlette_client import OAuth
+from starlette.config import Config
+from starlette.middleware.sessions import SessionMiddleware
 
 # база данных
 import sqlite3
@@ -26,6 +30,17 @@ TOKEN_MINUTES, SECRET_KEY, ALGORITHM  = 30, "secret-key", "HS256"
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
+config = Config(".env")
+
+oauth = OAuth(config)
+oauth.register(
+    name="google",
+    client_id=config("GOOGLE_CLIENT_ID"),
+    client_secret=config("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+    authorize_params={"access_type": "offline", "prompt": "consent"},
+)
 
 # создание токена
 def create_access_token(subject: str, expires_delta=None) -> str:
@@ -44,7 +59,12 @@ def verify_password(password: str, hashed: str) -> bool:
 
 # подключение к FastAPI
 app = FastAPI()
-
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=config("SECRET_KEY"),
+    same_site="lax",      # критично для OAuth
+    https_only=False      # если ты не на HTTPS
+)
 # путь к статическим файлам таким как CSS
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -72,8 +92,15 @@ def conectDB():
         '''
         CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username VARCHAR(16),
-            password VARCHAR(16)
+
+            username TEXT UNIQUE,
+            password TEXT,
+
+            google_id TEXT UNIQUE,
+
+            email TEXT,
+            name TEXT,
+            avatar TEXT
         );
         '''
     )
@@ -132,7 +159,7 @@ def check_token(access_token: str, username: str):
 
     if time.time() >= expires_at:
         raise HTTPException(detail="Token expired", status_code=404)
-        
+
 
 # ссылки на все страницы
 @app.get("/", tags=["lincs"])
@@ -175,9 +202,102 @@ def to_comments(request: Request):
 
 @app.get("/account/{username}/{access_token}", tags=["lincs"], response_class=HTMLResponse)
 def to_account(request: Request, username: str, access_token: str):
-    check_token(access_token, username)
+    try:
+        check_token(access_token, username)
+    except Exception:
+        return FileResponse("pages/sign_in.html")
     context = get_personal_posts(request, username)
     return templates.TemplateResponse("account.html", context)
+
+
+@app.get("/login/google")
+async def login(request: Request):
+    redirect_uri = request.url_for("google_auth")
+    return await oauth.google.authorize_redirect(request, redirect_uri)
+
+@app.get("/auth/google", name="google_auth")
+async def auth_google(request: Request):
+    # 1. Получаем access_token
+    token = await oauth.google.authorize_access_token(request)
+
+    # 2. Получаем данные пользователя через API Google
+    resp = await oauth.google.get(
+        "https://openidconnect.googleapis.com/v1/userinfo",
+        token=token
+    )
+    user_info = resp.json()
+
+    google_id = user_info["sub"]
+    email = user_info.get("email")
+    name = user_info.get("name")
+    avatar = user_info.get("picture")
+
+    con, cursor = conectDB()
+
+    # 3. Ищем пользователя по google_id
+    user = cursor.execute(
+        "SELECT id FROM users WHERE google_id = ?",
+        (google_id,)
+    ).fetchone()
+
+    # 4. Если нет — пробуем по email
+    if not user and email:
+        user = cursor.execute(
+            "SELECT id FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
+
+        if user:
+            cursor.execute(
+                "UPDATE users SET google_id = ? WHERE email = ?",
+                (google_id, email)
+            )
+            con.commit()
+
+    # 5. Если вообще нет — создаём
+    if not user:
+        cursor.execute(
+            """
+            INSERT INTO users (google_id, email, name, avatar)
+            VALUES (?, ?, ?, ?)
+            """,
+            (google_id, email, name, avatar)
+        )
+        con.commit()
+
+    # 6. Создаём твой JWT
+    email = email.split("@")[0]
+    
+    subject = email if email else google_id
+    access_token = create_access_token(subject)
+    
+    response = RedirectResponse(url="/")
+
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=False,  # 👈 если хочешь читать в JS
+        secure=False,    # True если HTTPS
+        samesite="lax"
+    )
+    
+    response.set_cookie(
+    key="username",
+    value=subject,
+    httponly=False,
+    path="/"
+    )
+
+    # 7. Редирект
+    return response
+
+@app.get("/profile")
+async def profile(request: Request):
+    user = request.session.get("user")
+    if not user:
+        return JSONResponse({"error": "Не авторизован"}, status_code=401)
+    return RedirectResponse(url="/")
+
 
 # авторизация формы
 @app.post("/auth")
@@ -189,19 +309,21 @@ async def auth(data: Form):
         SELECT username, password FROM users WHERE username = ?
         """,
         (data.username,)
-    ).fetchall()
+    ).fetchone()
 
     if not user:
         raise HTTPException(status_code=400, detail="username not found")
 
-    password = user[0][1]
-    
-    if verify_password(data.password, password) == False:
+    db_username, db_password = user
+
+    if not db_password:
+        raise HTTPException(status_code=400, detail="Use Google login")
+
+    if not verify_password(data.password, db_password):
         raise HTTPException(status_code=400, detail="Incorrect password")
-    else:
-        token = create_access_token(data.username)
-        token = Token(access_token=token)
-        return token
+
+    token = create_access_token(db_username)
+    return Token(access_token=token)
 
 
 # регестрация формы
@@ -259,20 +381,44 @@ def add_post(data: Post):
     payload = decode(data.access_token, SECRET_KEY, algorithms=[ALGORITHM])
     username = payload["sub"]
     
+    from tests import random_post
+
+    content = random_post()
+
     cursor.execute(
         '''
         INSERT INTO posts (content, username) VALUES (?, ?)
         ''',
-        (data.content, username)
+        (content, "test_user")
     )
+
     cursor.execute(
         '''
         INSERT INTO reactions (post_id, username) VALUES (
         (SELECT id FROM posts where content = ?), ?
         )
         ''',
-        (data.content, username)
+        (content, "test_user")
     )
+
+
+
+
+
+    # cursor.execute(
+    #     '''
+    #     INSERT INTO posts (content, username) VALUES (?, ?)
+    #     ''',
+    #     (data.content, username)
+    # )
+    # cursor.execute(
+    #     '''
+    #     INSERT INTO reactions (post_id, username) VALUES (
+    #     (SELECT id FROM posts where content = ?), ?
+    #     )
+    #     ''',
+    #     (data.content, username)
+    # )
         
     con.commit()
     con.close()
