@@ -14,7 +14,7 @@ def post_comment():
 
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
-        api_key="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"
+        api_key=os.getenv("API_KEY")
     )
 
 
